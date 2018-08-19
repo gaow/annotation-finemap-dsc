@@ -1,6 +1,7 @@
+docs/analysis.html
+docs/analysis.tpl
+docs/analysis/dsc.html
+docs/analysis/report.html
 docs/index.html
 docs/index.tpl
 docs/js/docs.js
-docs/report.html
-docs/report.tpl
-docs/report/index.html

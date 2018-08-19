@@ -141,12 +141,12 @@ $( document ).ready(function(){
             st.toc_index=0;
             // fire the main function with these parameters
             table_of_contents(cfg, st);
-            var file=reportDict[$("h1:first").attr("id")];
+            var file=analysisDict[$("h1:first").attr("id")];
             $("#toc-level0 a").css("color","#126dce");
             $('a[href="#'+$("h1:first").attr("id")+'"]').hide()
-            var docs=reportArray;
-            var docs_map=reportArrayMap;
-            var pos=reportArray.indexOf(file);
+            var docs=analysisArray;
+            var docs_map=analysisArrayMap;
+            var pos=analysisArray.indexOf(file);
             for (var a=pos;a>=0;a--){
                   $('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>').insertBefore("#toc-level0 li:eq(0)");
             }
@@ -219,7 +219,7 @@ body {
 </li>
         
 <li>
-  <a href="../report/index.html">Report</a>
+  <a href="../analysis.html">Analysis</a>
 </li>
         
       </ul>
@@ -243,7 +243,7 @@ body {
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/27288ae935e7a0d8c74f55ad8398c6412bca0341/report/report.ipynb"><code>report/report.ipynb</code></a> committed by Gao Wang on Sat Aug 18 19:36:50 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/27288ae935e7a0d8c74f55ad8398c6412bca0341">revision 1, 27288ae</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/1bae3c18af30a7a8cb51b61690ca7d685ce88151/analysis/report.ipynb"><code>analysis/report.ipynb</code></a> committed by Gao Wang on Sat Aug 18 19:44:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/1bae3c18af30a7a8cb51b61690ca7d685ce88151">revision 1, 1bae3c1</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

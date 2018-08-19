@@ -186,7 +186,7 @@ $(document).ready(function () {
 </li>
         
 <li>
-  <a href="./report/index.html">Report</a>
+  <a href="./analysis.html">Analysis</a>
 </li>
         
       </ul>

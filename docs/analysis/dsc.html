@@ -1,0 +1,1087 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="ipynb_website:version" content="0.9.5" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" type="text/css" href="../css/jt.css">
+
+<link rel="stylesheet" type="text/css" href="../css/toc2.css">
+
+<link href="../site_libs/jqueryui-1.11.4/jquery-ui.css">
+<link rel="stylesheet" href="../site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="../site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<link rel="stylesheet"
+      href="../site_libs/highlightjs/null.min.css"
+      type="text/css" />
+
+<script src="../site_libs/highlightjs/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+<script src="../js/doc_toc.js"></script>
+<script src="../js/docs.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+        },
+        "HTML-CSS": {
+            preferredFont: "TeX",
+            availableFonts: ["TeX"],
+            styles: {
+                scale: 110,
+                ".MathJax_Display": {
+                    "font-size": "110%",
+                }
+            }
+        }
+    });
+</script>
+<script>
+function filterDataFrame(id) {
+    var input = document.getElementById("search_" + id);
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("dataframe_" + id);
+    var tr = table.getElementsByTagName("tr");
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < tr.length; i++) {
+        for (var j = 0; j < tr[i].cells.length; ++j) {
+            var matched = false;
+            if (tr[i].cells[j].innerHTML.toUpperCase().indexOf(filter) != -1) {
+                tr[i].style.display = "";
+                matched = true
+                break;
+            }
+            if (!matched)
+                tr[i].style.display = "none";
+        }
+    }
+}
+function sortDataFrame(id, n, dtype) {
+    var table = document.getElementById("dataframe_" + id);
+    var tb = table.tBodies[0]; // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
+    var tr = Array.prototype.slice.call(tb.rows, 0); // put rows into array
+    if (dtype === 'numeric') {
+        var fn = function(a, b) { 
+            return parseFloat(a.cells[n].textContent) <= parseFloat(b.cells[n].textContent) ? -1 : 1;
+        }
+    } else {
+        var fn = function(a, b) {
+            var c = a.cells[n].textContent.trim().localeCompare(b.cells[n].textContent.trim()); 
+            return c > 0 ? 1 : (c < 0 ? -1 : 0) }
+    }
+    var isSorted = function(array, fn) {
+        if (array.length < 2)
+            return 1;
+        var direction = fn(array[0], array[1]); 
+        for (var i = 1; i < array.length - 1; ++i) {
+            var d = fn(array[i], array[i+1]);
+            if (d == 0)
+                continue;
+            else if (direction == 0)
+                direction = d;
+            else if (direction != d)
+                return 0;
+            }
+        return direction;
+    }
+    var sorted = isSorted(tr, fn);
+    if (sorted == 1 || sorted == -1) {
+        // if sorted already, reverse it
+        for(var i = tr.length - 1; i >= 0; --i)
+            tb.appendChild(tr[i]); // append each row in order
+    } else {
+        tr = tr.sort(fn);
+        for(var i = 0; i < tr.length; ++i)
+            tb.appendChild(tr[i]); // append each row in order
+    }
+}
+</script>
+
+<script>
+$( document ).ready(function(){
+            var cfg={'threshold':3,     // depth of toc (number of levels)
+             'number_sections': false,
+             'toc_cell': false,          // useless here
+             'toc_window_display': true, // display the toc window
+             "toc_section_display": "block", // display toc contents in the window
+             'sideBar':true,       // sidebar or floating window
+             'navigate_menu':false       // navigation menu (only in liveNotebook -- do not change)
+            }
+            var st={};                  // some variables used in the script
+            st.rendering_toc_cell = false;
+            st.config_loaded = false;
+            st.extension_initialized=false;
+            st.nbcontainer_marginleft = $('#notebook-container').css('margin-left')
+            st.nbcontainer_marginright = $('#notebook-container').css('margin-right')
+            st.nbcontainer_width = $('#notebook-container').css('width')
+            st.oldTocHeight = undefined
+            st.cell_toc = undefined;
+            st.toc_index=0;
+            // fire the main function with these parameters
+            table_of_contents(cfg, st);
+            var file=analysisDict[$("h1:first").attr("id")];
+            $("#toc-level0 a").css("color","#126dce");
+            $('a[href="#'+$("h1:first").attr("id")+'"]').hide()
+            var docs=analysisArray;
+            var docs_map=analysisArrayMap;
+            var pos=analysisArray.indexOf(file);
+            for (var a=pos;a>=0;a--){
+                  $('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>').insertBefore("#toc-level0 li:eq(0)");
+            }
+            $('a[href="'+file+'.html'+'"]').css("color","#126dce");
+            for (var a=pos+1;a<docs.length;a++){
+                  $(".toc #toc-level0").append('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>');
+            }
+            // $("#toc-header").hide(); // comment out because it prevents search bar from displaying
+    });
+</script>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+  // mark it active
+  menuAnchor.parent().addClass('active');
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+<div class="container-fluid main-container">
+<!-- tabsets -->
+<script src="../site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+
+
+<title>Fine-mapping with annotations</title>
+
+<style type = "text/css">
+body {
+  font-family: "Droid Sans";
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+</style>
+</head>
+
+<body>
+<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="container" id="notebook-container">
+
+<!-- code folding -->
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html">Fine-mapping with annotations</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+<li>
+  <a href="../index.html">DSC</a>
+</li>
+        
+<li>
+  <a href="../analysis.html">Analysis</a>
+</li>
+        
+      </ul>
+        
+<ul class="nav navbar-nav navbar-right">
+<li>
+   <a href="http://github.com/gaow/annotation-finemap-dsc"> <span class="fa fa-github"></span> </a>
+</li>
+</ul>
+        
+      </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Annotation-enhanced-genetic-fine-mapping">Annotation enhanced genetic fine-mapping<a class="anchor-link" href="#Annotation-enhanced-genetic-fine-mapping">&#182;</a></h1><h2 id="Aim">Aim<a class="anchor-link" href="#Aim">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This simulation study compares fine-mapping with use of annotations / without it, in terms of:</p>
+<ol>
+<li>Improvements in fine-mapping resolution: with the use of annotations we expect to provide smaller sets of candidate SNPs than without them.</li>
+<li>Improvements in power: the top signal from each candidate fine-mapping cluster is more likely to be the true causal signal when annotations are used.</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We choose common variants (MAF &gt; 1%). We create genomic regions (fine-mapping units) each containing 1,000 SNPs; thus retaining the realistic LD pattern between SNPs.</p>
+<h3 id="Phenotype-data">Phenotype data<a class="anchor-link" href="#Phenotype-data">&#182;</a></h3><p>We assume each analysis unit contains 1, 2, 3 or 4 causal variants. The genomic position of causal variants are simulated to associate with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome. For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the unit of interest. Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside these regions respectively,</p>
+<p>\begin{align}
+\gamma &amp; = \frac{p_1/1-p_1}{p_0/1-p_0} \\
+L &amp; = [qp_1 + (1-q)p_0] \times N
+\end{align}</p>
+<p>where $\gamma$ is the mean odds ratio ($\gamma = 4.74$), $L$ is the number of causal variants in the region ($L = 1,2,3,4$), $N$ is total length of the region ($N=1000$), $q$ is proportion of annotation covered region ($q=0.1336$).</p>
+<p>To simulate phenotypes we assume for a causal variant an effect size $\beta_j \sim N(0, \sigma^2)$. We generate phenotype from a linear model $y=X\beta + E, E \sim N(0, \sigma_a^2)$. Relative strength of $\sigma^2$ and $\sigma_a$ are determined by percentage of variance explained (PVE) by all genetic effects. We set PVE to 0.1.</p>
+<h3 id="Caveats">Caveats<a class="anchor-link" href="#Caveats">&#182;</a></h3><p>Here we only have ~600 genotype samples to work with. Also we simulated quantitive phenotypes. The type of GWAS of interest here typically involves hundreds of thousands of samples with binary disease outcome. However we argue that in practice we work with summary statistics, which are typically z-scores whether they are from GWAS of disease phenotypes or quantitative traits. Although generated from ~600 sample, the observed effect sizes $\hat{\beta}$ should have similar "LD convoluted" structure as they are from larger samples. So our settings here should be good enough.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Analysis">Analysis<a class="anchor-link" href="#Analysis">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="DSC-benchmark">DSC benchmark<a class="anchor-link" href="#DSC-benchmark">&#182;</a></h2><p>Simulate study is implemented in DSC framework. Input data are just matrices of genotypes.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="zzz.dsc"><code>zzz.dsc</code><a class="anchor-link" href="#zzz.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">zzz</span><span class="o">.</span><span class="n">dsc</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_prior</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_y</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/zzz.dsc" target="_blank">modules/zzz.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="master.dsc"><code>master.dsc</code><a class="anchor-link" href="#master.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">master</span><span class="o">.</span><span class="n">dsc</span>
+<span class="c1">#!/usr/bin/env dsc</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">zzz</span>
+
+<span class="kn">DSC:</span>
+    <span class="n">define</span><span class="p">:</span>
+        <span class="n">fit</span><span class="p">:</span> <span class="n">dap</span><span class="p">,</span> <span class="n">dapa</span>
+    <span class="n">run</span><span class="p">:</span> <span class="n">simulate_prior</span> <span class="o">*</span> <span class="n">simulate_y</span> <span class="o">*</span> <span class="n">fit</span> <span class="o">*</span> <span class="n">evaluate</span>
+    <span class="n">exec_path</span><span class="p">:</span> <span class="n">modules</span>
+    <span class="k">global</span><span class="p">:</span>
+        <span class="n">data_file</span><span class="p">:</span> <span class="n">gtex</span><span class="o">-</span><span class="n">manifest</span><span class="o">.</span><span class="n">txt</span>
+        <span class="n">n_units</span><span class="p">:</span> <span class="mi">10</span>
+    <span class="n">output</span><span class="p">:</span> <span class="n">xh_grant</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="master.dsc" target="_blank">master.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="simulate_prior.dsc"><code>simulate_prior.dsc</code><a class="anchor-link" href="#simulate_prior.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_prior</span><span class="o">.</span><span class="n">dsc</span>
+
+<span class="kn">simulate_prior:</span> <span class="n">sim_prior</span><span class="o">.</span><span class="n">R</span> <span class="o">+</span> <span class="n">R</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="n">dataset</span><span class="p">);</span>
+                           <span class="n">X</span> <span class="o">=</span> <span class="n">get_loci</span><span class="p">(</span><span class="n">data</span><span class="err">$</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
+                           <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+  <span class="n">dataset</span><span class="p">:</span> <span class="n">Shell</span><span class="p">{</span><span class="n">head</span> <span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">n_units</span><span class="p">}</span> <span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">}}</span>
+  <span class="n">N</span><span class="p">:</span> <span class="mi">1000</span>
+  <span class="n">chunks</span><span class="p">:</span> <span class="mi">5</span>
+  <span class="n">g</span><span class="p">:</span> <span class="mf">4.74</span>
+  <span class="n">q</span><span class="p">:</span> <span class="mf">0.1336</span>
+  <span class="err">$</span><span class="n">X</span><span class="p">:</span> <span class="n">X</span>
+  <span class="err">$</span><span class="n">prior</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">prior</span>
+  <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_prior.dsc" target="_blank">modules/simulate_prior.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="simulate_y.dsc"><code>simulate_y.dsc</code><a class="anchor-link" href="#simulate_y.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_y</span><span class="o">.</span><span class="n">dsc</span>
+<span class="kn">simulate_y:</span> <span class="n">sim_y</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">residual_var</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">))</span>
+  <span class="n">X</span><span class="p">:</span> <span class="err">$</span><span class="n">X</span>
+  <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
+  <span class="n">n_signal</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
+  <span class="n">pve</span><span class="p">:</span> <span class="mf">0.1</span>
+  <span class="n">amplitude</span><span class="p">:</span> <span class="mf">0.6</span>
+  <span class="err">$</span><span class="n">y</span><span class="p">:</span> <span class="n">y</span>
+  <span class="err">$</span><span class="n">coef</span><span class="p">:</span> <span class="n">coef</span>
+  <span class="err">$</span><span class="n">L</span><span class="p">:</span> <span class="n">L</span>
+  <span class="err">$</span><span class="n">residual_var</span><span class="p">:</span> <span class="n">residual_var</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_y.dsc" target="_blank">modules/simulate_y.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="fit.dsc"><code>fit.dsc</code><a class="anchor-link" href="#fit.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span><span class="o">.</span><span class="n">dsc</span>
+
+<span class="kn">dap:</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+  <span class="n">X</span><span class="p">:</span> <span class="err">$</span><span class="n">X</span>
+  <span class="n">y</span><span class="p">:</span> <span class="err">$</span><span class="n">y</span>
+  <span class="n">args</span><span class="p">:</span> <span class="s2">&quot;-ld_control 0.20 --all&quot;</span>
+  <span class="n">cache</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">DAP</span><span class="p">)</span>
+  <span class="err">$</span><span class="n">posterior</span><span class="p">:</span> <span class="n">posterior</span>
+
+<span class="n">dapa</span><span class="p">(</span><span class="n">dap</span><span class="p">):</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+  <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/fit.dsc" target="_blank">modules/fit.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="evaluate.dsc"><code>evaluate.dsc</code><a class="anchor-link" href="#evaluate.dsc">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span><span class="o">.</span><span class="n">dsc</span>
+
+<span class="kn">evaluate:</span> <span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
+  <span class="n">coef</span><span class="p">:</span> <span class="err">$</span><span class="n">coef</span>
+  <span class="n">posterior</span><span class="p">:</span> <span class="err">$</span><span class="n">posterior</span>
+  <span class="err">$</span><span class="n">is_recovered</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_recovered</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+  <span class="err">$</span><span class="n">is_cs_true</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_cs_true</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+  <span class="err">$</span><span class="n">is_top_true</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_top_true</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+  <span class="err">$</span><span class="n">size</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">size</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+  <span class="err">$</span><span class="n">purity</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">purity</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/evaluate.dsc" target="_blank">modules/evaluate.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Simulation">Simulation<a class="anchor-link" href="#Simulation">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="sim_prior.R"><code>sim_prior.R</code><a class="anchor-link" href="#sim_prior.R">&#182;</a></h3><p>From equations above, assuming $L=1$ we derive:</p>
+<p>\begin{align}
+p_1 = \frac{\gamma p_0}{1 - p_0 + \gamma p_0} \\
+N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
+\end{align}</p>
+<p>We can solve this numerically in R, eg:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.74</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">q</span> <span class="o">=</span> <span class="mf">0.1336</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">g</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">N</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">+</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">p0</span> <span class="o">=</span> <span class="n">uniroot</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="o">.</span><span class="n">Machine</span><span class="err">$</span><span class="n">double</span><span class="o">.</span><span class="n">eps</span><span class="o">^</span><span class="mf">0.8</span><span class="p">)</span><span class="err">$</span><span class="n">root</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="o">+</span><span class="n">g</span><span class="o">*</span><span class="n">p0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span><span class="n">p1</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] 0.000667518 0.003156156
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># verify it:</span>
+<span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">p0</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] 4.74
+[1] 1
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>We should be good. I'll use this in my simulation code below.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_prior</span><span class="o">.</span><span class="n">R</span>
+<span class="n">get_loci</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">segs</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">segs</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">X</span><span class="p">[,</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
+<span class="p">}</span>
+<span class="n">get_prior</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">g</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">N</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">+</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">p0</span> <span class="o">=</span> <span class="n">uniroot</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="o">.</span><span class="n">Machine</span><span class="err">$</span><span class="n">double</span><span class="o">.</span><span class="n">eps</span><span class="o">^</span><span class="mf">0.8</span><span class="p">)</span><span class="err">$</span><span class="n">root</span>
+    <span class="n">p1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="o">+</span><span class="n">g</span><span class="o">*</span><span class="n">p0</span><span class="p">)</span>
+    <span class="n">per_chunk_len</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">q</span> <span class="o">/</span> <span class="n">chunks</span>
+    <span class="n">n_bins</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="n">chunks</span><span class="p">)</span>
+    <span class="n">annotated</span> <span class="o">=</span> <span class="n">unlist</span><span class="p">(</span><span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">chunks</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="n">per_chunk_len</span><span class="p">)))</span>
+    <span class="n">prior</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">prior</span><span class="p">[</span><span class="n">annotated</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1</span>                          
+    <span class="nb">list</span><span class="p">(</span><span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">annotated</span><span class="p">)</span>                          
+<span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/sim_prior.R" target="_blank">modules/sim_prior.R</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="sim_y.py"><code>sim_y.py</code><a class="anchor-link" href="#sim_y.py">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_y</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pformat</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="k">class</span> <span class="nc">RegressionData</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="c1"># FIXME: check if inputs are indeed numpy arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
+        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">center_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># for np.array: np.mean(Z, axis=0, keepdims=True)</span>
+        <span class="c1"># for np.matrix, no keepdims argument</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">UnivariateSimulator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pi0</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pis</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mus</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span> <span class="o">=</span> <span class="bp">None</span>
+        
+    <span class="k">def</span> <span class="nf">set_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pis</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mus</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">amplitude</span><span class="p">]</span>
+        
+    <span class="k">def</span> <span class="nf">get_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        beta ~ \pi_0\delta_0 + \sum \pi_i N(mu_i, sigma_i)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">sigmas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">))</span> <span class="o">==</span> <span class="n">sigmas</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="n">mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mix</span> <span class="o">*</span> <span class="n">masks</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">sparsify_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_non_zero</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
+        <span class="c1"># FIXME: might overlap if some prior is very high; thus not gauranteed to have num_non_zero non-zeros</span>
+        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">num_non_zero</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">*</span> <span class="n">ones</span>
+                
+    <span class="k">def</span> <span class="nf">get_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regression_data</span><span class="p">,</span> <span class="n">pve</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">pve</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need one of sigma or pve.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pve</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pve</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;PVE has to be between 0 and 1, not {pve}.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">pve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">genetic_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+            <span class="n">pheno_var</span> <span class="o">=</span> <span class="n">genetic_var</span> <span class="o">/</span> <span class="n">pve</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span> <span class="o">=</span> <span class="n">pheno_var</span> <span class="o">-</span> <span class="n">genetic_var</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">),</span> <span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="c1"># y.reshape(len(y), 1)</span>
+        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">T</span>
+    
+<span class="k">def</span> <span class="nf">simple_lm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
+    <span class="n">reg</span> <span class="o">=</span> <span class="n">RegressionData</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="n">reg</span><span class="o">.</span><span class="n">center_data</span><span class="p">()</span>
+    <span class="n">eff</span> <span class="o">=</span> <span class="n">UnivariateSimulator</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">eff</span><span class="o">.</span><span class="n">set_vanilla</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">])</span>
+    <span class="n">eff</span><span class="o">.</span><span class="n">get_effects</span><span class="p">()</span>
+    <span class="n">eff</span><span class="o">.</span><span class="n">sparsify_effects</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;n_signal&#39;</span><span class="p">],</span> <span class="n">prior</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">eff</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">pve</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;pve&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">eff</span><span class="o">.</span><span class="n">coef</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">eff</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
+    <span class="n">coef</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">}</span>
+    <span class="n">residual_var</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">}</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;n_signal&#39;</span><span class="p">:</span> <span class="n">n_signal</span><span class="p">,</span> <span class="s1">&#39;pve&#39;</span><span class="p">:</span> <span class="n">pve</span><span class="p">,</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitude</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">simple_lm</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">prior</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+        <span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">residual_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">coef</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">residual_var</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">coef</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/sim_y.py" target="_blank">modules/sim_y.py</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Fine-mapping-with-DAP">Fine-mapping with DAP<a class="anchor-link" href="#Fine-mapping-with-DAP">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="fit_dap.py"><code>fit_dap.py</code><a class="anchor-link" href="#fit_dap.py">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Below is example output for DAP-G:</p>
+
+<pre><code>Posterior expected model size: 0.500 (sd = 0.500)
+LogNC = -0.30685 ( Log10NC = -0.133 )
+Posterior inclusion probability
+
+((1))              7492 6.68581e-05       0.000 1
+((2))              7490 6.68581e-05       0.000 1
+... 7 lines
+((8))              7491 6.68046e-05       0.000 2
+((9))              7483 6.68046e-05       0.000 2
+((10))             7485 6.68046e-05       0.000 2
+... 13 lines
+((20))             7459 6.68046e-05       0.000 2
+((21))             7482 6.67422e-05       0.000 -1
+((22))             7489 6.67422e-05       0.000 -1
+... other lines until below ...
+
+Independent association signal clusters
+
+     cluster         member_snp      cluster_pip      average_r2
+       {1}              7            4.680e-04          0.951                 0.951   0.037
+       {2}             13            8.685e-04          0.623                 0.037   0.623</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">write_dap_full</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prefix</span><span class="p">,</span><span class="n">r</span><span class="p">):</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="s1">&#39;geno&#39;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;group_{r}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.data&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="o">*</span><span class="p">([</span><span class="s1">&#39;pheno&#39;</span><span class="p">,</span> <span class="s1">&#39;pheno&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;group_{r}&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())),</span> <span class="nb">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)),</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="c1">#     grid = &#39;&#39;&#39;         </span>
+<span class="c1">#         0.0000  0.1000</span>
+<span class="c1">#         0.0000  0.2000</span>
+<span class="c1">#         0.0000  0.4000</span>
+<span class="c1">#         0.0000  0.8000</span>
+<span class="c1">#         0.0000  1.6000</span>
+<span class="c1">#         &#39;&#39;&#39;</span>
+<span class="c1">#     grid = &#39;\n&#39;.join([x.strip() for x in grid.strip().split(&#39;\n&#39;)])</span>
+<span class="c1">#     with open(f&#39;{prefix}.grid&#39;, &#39;w&#39;) as f:</span>
+<span class="c1">#         print(grid, file=f)</span>
+
+<span class="k">def</span> <span class="nf">write_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;{i+1}</span><span class="se">\t</span><span class="s1">{p}&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prior</span><span class="p">)]))</span>
+
+<span class="k">def</span> <span class="nf">run_dap_full</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dap-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.data&#39;</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">,</span> <span class="s1">&#39;--output_all&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">])</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>    
+
+<span class="k">def</span> <span class="nf">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+    <span class="n">pips</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">still_pip</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cluster_pip&#39;</span><span class="p">:</span>
+            <span class="n">still_pip</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">still_pip</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;((&#39;</span><span class="p">)):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">still_pip</span><span class="p">:</span>
+            <span class="n">pips</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">])])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">])])</span>
+    <span class="n">pips</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pips</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">,</span> <span class="s1">&#39;snp_prob&#39;</span><span class="p">,</span> <span class="s1">&#39;snp_log10bf&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">])</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster_prob&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster_avg_r2&#39;</span><span class="p">])</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">pips</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;cluster&#39;</span><span class="p">])[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">on</span> <span class="o">=</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;snp&#39;</span><span class="p">:</span> <span class="n">pips</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span> <span class="n">clusters</span><span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">dap_single</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">write_dap_full</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prefix</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">write_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
+    <span class="n">run_dap_full</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/fit_dap.py" target="_blank">modules/fit_dap.py</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Evaluate-results">Evaluate results<a class="anchor-link" href="#Evaluate-results">&#182;</a></h2><h3 id="evaluate.py"><code>evaluate.py</code><a class="anchor-link" href="#evaluate.py">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
+<span class="k">def</span> <span class="nf">dap_summary</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">coef</span><span class="p">):</span>
+    <span class="n">cluster</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;cluster_prob&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">]</span>
+    <span class="c1"># to return</span>
+    <span class="n">purity</span> <span class="o">=</span> <span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;cluster_prob&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="n">cluster</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">]]</span>
+    <span class="n">signal_detected</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="n">signal_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{idx+1}&#39;</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># to return</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
+    <span class="n">snp</span> <span class="o">=</span> <span class="p">[</span><span class="n">snp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">snp</span><span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">c</span><span class="p">)]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
+    <span class="n">top_snp</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;snp_prob&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;snp_prob&#39;</span><span class="p">])][</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">snp</span><span class="p">]</span>
+    <span class="c1"># to return</span>
+    <span class="n">is_top_true</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_expected</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">top_snp</span><span class="p">]</span>
+    <span class="c1"># to return</span>
+    <span class="n">is_recovered</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_detected</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_expected</span><span class="p">]</span>
+    <span class="c1"># to return</span>
+    <span class="n">is_cs_true</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">signal_expected</span><span class="p">))</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_detected</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">is_recovered</span><span class="p">,</span> <span class="n">is_cs_true</span><span class="p">,</span> <span class="n">is_top_true</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">purity</span>
+
+<span class="n">is_recovered</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">is_cs_true</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">is_top_true</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">size</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">purity</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">posterior</span><span class="p">:</span>
+    <span class="n">is_recovered</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_cs_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_top_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">purity</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dap_summary</span><span class="p">(</span><span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;set&#39;</span><span class="p">],</span> <span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;snp&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/evaluate_dap.py" target="_blank">modules/evaluate_dap.py</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<hr>
+&copy 2018 Gao Wang at Stephens Lab, University of Chicago
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/1bae3c18af30a7a8cb51b61690ca7d685ce88151/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 19:44:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/1bae3c18af30a7a8cb51b61690ca7d685ce88151">revision 1, 1bae3c1</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+</div>
+</div>
+</body>
+</html>
