@@ -218,10 +218,6 @@ body {
       <ul class="nav navbar-nav">
         
 <li>
-  <a href="../index.html">DSC</a>
-</li>
-        
-<li>
   <a href="../analysis.html">Analysis</a>
 </li>
         
