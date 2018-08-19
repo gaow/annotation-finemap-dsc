@@ -233,9 +233,181 @@ body {
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Let's skip the formalities and dive directly into the results: power, false discovery proportion, top hit rate, size and purity.</p>
+<p>To get the results,</p>
+
+<pre><code>sos run report.ipynb</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="kn">parameter:</span> <span class="n">cwd</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/GIT/github/annotation-finemap/analysis&#39;</span><span class="p">)</span>
+<span class="kn">parameter:</span> <span class="n">date</span> <span class="o">=</span> <span class="s1">&#39;0818&#39;</span>
+<span class="n">dirname</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{cwd:a}/xh_grant/&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">default_1</span><span class="p">]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{dirname}/{date}.out.rds&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">dscquery</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">dirname</span><span class="p">:</span><span class="n">br</span><span class="p">},</span> <span class="n">target</span> <span class="o">=</span> <span class="s2">&quot;simulate_prior.dataset simulate_y.n_signal fit evaluate&quot;</span><span class="p">,</span> <span class="n">load</span><span class="o">.</span><span class="n">pkl</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
+    <span class="n">saveRDS</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">default_2</span><span class="p">]</span>
+<span class="n">cluster_cutoff</span> <span class="o">=</span> <span class="mf">0.95</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.summary.rds&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
+    <span class="n">options</span><span class="p">(</span><span class="n">warn</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">dat</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+    <span class="n">n_signals</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">dat</span><span class="err">$</span><span class="n">simulate_y</span><span class="o">.</span><span class="n">n_signal</span><span class="p">)</span>
+    <span class="n">data_sets</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">dat</span><span class="err">$</span><span class="n">simulate_prior</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+    <span class="n">dap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">dapa</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">NULL</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">s</span> <span class="ow">in</span> <span class="n">n_signals</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">power_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">power_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fdp_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fdp_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hit_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hit_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(),</span> <span class="n">purity</span> <span class="o">=</span> <span class="n">vector</span><span class="p">())</span>
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">power_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">power_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fdp_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">fdp_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hit_d</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">hit_n</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(),</span> <span class="n">purity</span> <span class="o">=</span> <span class="n">vector</span><span class="p">())</span>
+      <span class="k">for</span> <span class="p">(</span><span class="n">d</span> <span class="ow">in</span> <span class="n">data_sets</span><span class="p">)</span> <span class="p">{</span>
+          <span class="c1">## for DAP</span>
+          <span class="n">tmp</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;${dirname}/&quot;</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">dat</span><span class="err">$</span><span class="n">fit</span> <span class="o">==</span> <span class="s1">&#39;dap&#39;</span> <span class="o">&amp;</span> <span class="n">dat</span><span class="err">$</span><span class="n">simulate_y</span><span class="o">.</span><span class="n">n_signal</span> <span class="o">==</span> <span class="n">s</span> <span class="o">&amp;</span> <span class="n">dat</span><span class="err">$</span><span class="n">simulate_prior</span><span class="o">.</span><span class="n">dataset</span> <span class="o">==</span> <span class="n">d</span><span class="p">),</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;evaluate.output.file&#39;</span><span class="p">)],</span> <span class="s2">&quot;.rds&quot;</span><span class="p">))</span>
+          <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">))</span> <span class="p">{</span>
+              <span class="c1"># power</span>
+              <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">+</span> <span class="n">ifelse</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">[[</span><span class="n">i</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">[[</span><span class="n">i</span><span class="p">]]))</span>
+              <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span> <span class="o">+</span> <span class="n">s</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;failed&#39;</span><span class="p">)</span> <span class="p">{</span>
+                  <span class="c1"># fdp</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># top hit in cluster is signal</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_top_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_top_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># size</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">,</span> <span class="n">tmp</span><span class="err">$</span><span class="n">size</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># purity</span>
+                  <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">,</span> <span class="n">tmp</span><span class="err">$</span><span class="n">purity</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+              <span class="p">}</span>
+          <span class="p">}</span>
+          <span class="c1">## for DAP with annotation</span>
+          <span class="n">tmp</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;${dirname}/&quot;</span><span class="p">,</span> <span class="n">dat</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">dat</span><span class="err">$</span><span class="n">fit</span> <span class="o">==</span> <span class="s1">&#39;dapa&#39;</span> <span class="o">&amp;</span> <span class="n">dat</span><span class="err">$</span><span class="n">simulate_y</span><span class="o">.</span><span class="n">n_signal</span> <span class="o">==</span> <span class="n">s</span> <span class="o">&amp;</span> <span class="n">dat</span><span class="err">$</span><span class="n">simulate_prior</span><span class="o">.</span><span class="n">dataset</span> <span class="o">==</span> <span class="n">d</span><span class="p">),</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;evaluate.output.file&#39;</span><span class="p">)],</span> <span class="s2">&quot;.rds&quot;</span><span class="p">))</span>
+          <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">))</span> <span class="p">{</span>
+              <span class="c1"># power</span>
+              <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">+</span> <span class="n">ifelse</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">[[</span><span class="n">i</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;failed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_recovered</span><span class="p">[[</span><span class="n">i</span><span class="p">]]))</span>
+              <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span> <span class="o">+</span> <span class="n">s</span>
+              <span class="k">if</span> <span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]][</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;failed&#39;</span><span class="p">)</span> <span class="p">{</span>
+                  <span class="c1"># fdp</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_cs_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># top hit in cluster is signal</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_top_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span> <span class="o">+</span> <span class="n">length</span><span class="p">(</span><span class="n">tmp</span><span class="err">$</span><span class="n">is_top_true</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># size</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">,</span> <span class="n">tmp</span><span class="err">$</span><span class="n">size</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+                  <span class="c1"># purity</span>
+                  <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">,</span> <span class="n">tmp</span><span class="err">$</span><span class="n">purity</span><span class="p">[[</span><span class="n">i</span><span class="p">]])</span>
+              <span class="p">}</span>
+          <span class="p">}</span>
+      <span class="p">}</span>
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">/</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span>
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">/</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span>    
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit</span> <span class="o">=</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">/</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span>
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span> <span class="o">=</span> <span class="n">median</span><span class="p">(</span><span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">)</span>
+      <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">)</span>
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_d</span> <span class="o">/</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power_n</span>
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_d</span> <span class="o">/</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp_n</span>    
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit</span> <span class="o">=</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_d</span> <span class="o">/</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit_n</span>
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span> <span class="o">=</span> <span class="n">median</span><span class="p">(</span><span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">)</span>
+      <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">)</span>
+      <span class="n">line</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power</span><span class="p">,</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">power</span><span class="p">,</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp</span><span class="p">,</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">fdp</span><span class="p">,</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit</span><span class="p">,</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">hit</span><span class="p">,</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">,</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">size</span><span class="p">,</span> <span class="n">dap</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">,</span> <span class="n">dapa</span><span class="p">[[</span><span class="n">s</span><span class="p">]]</span><span class="err">$</span><span class="n">purity</span><span class="p">)</span>
+      <span class="k">if</span> <span class="p">(</span><span class="n">s</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">line</span>
+      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">rbind</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">colnames</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;n_causal&#39;</span><span class="p">,</span> <span class="s1">&#39;DAP Power&#39;</span><span class="p">,</span> <span class="s1">&#39;aDAP Power&#39;</span><span class="p">,</span> <span class="s1">&#39;DAP FDP&#39;</span><span class="p">,</span> <span class="s1">&#39;aDAP FDP&#39;</span><span class="p">,</span> <span class="s1">&#39;DAP top hit rate&#39;</span><span class="p">,</span> <span class="s1">&#39;aDAP top hit rate&#39;</span><span class="p">,</span> <span class="s1">&#39;DAP size&#39;</span><span class="p">,</span> <span class="s1">&#39;aDAP size&#39;</span><span class="p">,</span> <span class="s1">&#39;DAP purity&#39;</span><span class="p">,</span> <span class="s1">&#39;aDAP purity&#39;</span><span class="p">)</span>
+    <span class="n">rownames</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="o">=</span> <span class="n">res</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">saveRDS</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">readRDS</span><span class="p">(</span><span class="s2">&quot;~/GIT/github/annotation-finemap/analysis/xh_grant/0818.summary.rds&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<table>
+<thead><tr><th></th><th scope=col>n_causal</th><th scope=col>DAP Power</th><th scope=col>aDAP Power</th><th scope=col>DAP FDP</th><th scope=col>aDAP FDP</th><th scope=col>DAP top hit rate</th><th scope=col>aDAP top hit rate</th><th scope=col>DAP size</th><th scope=col>aDAP size</th><th scope=col>DAP purity</th><th scope=col>aDAP purity</th></tr></thead>
+<tbody>
+	<tr><th scope=row>1</th><td>1         </td><td>0.8028169 </td><td>0.8169014 </td><td>0.00000000</td><td>0.00000000</td><td>0.5087719 </td><td>0.5172414 </td><td> 6        </td><td> 5.5      </td><td>0.9896211 </td><td>0.9897138 </td></tr>
+	<tr><th scope=row>2</th><td>2         </td><td>0.5070423 </td><td>0.5140845 </td><td>0.02702703</td><td>0.01351351</td><td>0.4459459 </td><td>0.5405405 </td><td>10        </td><td> 9.5      </td><td>0.9901743 </td><td>0.9913230 </td></tr>
+	<tr><th scope=row>3</th><td>3         </td><td>0.3239437 </td><td>0.3239437 </td><td>0.08000000</td><td>0.09210526</td><td>0.4000000 </td><td>0.3947368 </td><td>13        </td><td>11.0      </td><td>0.9910480 </td><td>0.9900447 </td></tr>
+	<tr><th scope=row>4</th><td>4         </td><td>0.2535211 </td><td>0.2605634 </td><td>0.10666667</td><td>0.10389610</td><td>0.4000000 </td><td>0.4285714 </td><td>15        </td><td>14.0      </td><td>0.9871613 </td><td>0.9893442 </td></tr>
+</tbody>
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/1bae3c18af30a7a8cb51b61690ca7d685ce88151/analysis/report.ipynb"><code>analysis/report.ipynb</code></a> committed by Gao Wang on Sat Aug 18 19:44:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/1bae3c18af30a7a8cb51b61690ca7d685ce88151">revision 1, 1bae3c1</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b/analysis/report.ipynb"><code>analysis/report.ipynb</code></a> committed by Gao Wang on Sat Aug 18 21:51:14 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b">revision 2, 82e4ffc</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

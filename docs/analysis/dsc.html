@@ -560,11 +560,11 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <span class="kn">evaluate:</span> <span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
   <span class="n">coef</span><span class="p">:</span> <span class="err">$</span><span class="n">coef</span>
   <span class="n">posterior</span><span class="p">:</span> <span class="err">$</span><span class="n">posterior</span>
-  <span class="err">$</span><span class="n">is_recovered</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_recovered</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-  <span class="err">$</span><span class="n">is_cs_true</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_cs_true</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-  <span class="err">$</span><span class="n">is_top_true</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">is_top_true</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-  <span class="err">$</span><span class="n">size</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">size</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
-  <span class="err">$</span><span class="n">purity</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">purity</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+  <span class="err">$</span><span class="n">is_recovered</span><span class="p">:</span> <span class="n">is_recovered</span>
+  <span class="err">$</span><span class="n">is_cs_true</span><span class="p">:</span> <span class="n">is_cs_true</span>
+  <span class="err">$</span><span class="n">is_top_true</span><span class="p">:</span> <span class="n">is_top_true</span>
+  <span class="err">$</span><span class="n">size</span><span class="p">:</span> <span class="n">size</span>
+  <span class="err">$</span><span class="n">purity</span><span class="p">:</span> <span class="n">purity</span>
 </pre></div>
 
 </div>
@@ -750,7 +750,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_y</span><span class="o">.</span><span class="n">py</span>
@@ -768,7 +768,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
         <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
         <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">))))</span>
 
     <span class="k">def</span> <span class="nf">center_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># for np.array: np.mean(Z, axis=0, keepdims=True)</span>
@@ -1027,17 +1027,19 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
 <span class="k">def</span> <span class="nf">dap_summary</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">coef</span><span class="p">):</span>
+    <span class="n">signal_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{idx+1}&#39;</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;cluster_prob&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cluster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
     <span class="c1"># to return</span>
     <span class="n">purity</span> <span class="o">=</span> <span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;cluster_prob&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">]]</span>
     <span class="n">signal_detected</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="p">[])</span>
-    <span class="n">signal_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{idx+1}&#39;</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
     <span class="c1"># to return</span>
     <span class="n">size</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
     <span class="n">snp</span> <span class="o">=</span> <span class="p">[</span><span class="n">snp</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">snp</span><span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">c</span><span class="p">)]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
@@ -1047,7 +1049,7 @@ Independent association signal clusters
     <span class="c1"># to return</span>
     <span class="n">is_recovered</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_detected</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_expected</span><span class="p">]</span>
     <span class="c1"># to return</span>
-    <span class="n">is_cs_true</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">signal_expected</span><span class="p">))</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">signal_detected</span><span class="p">]</span>
+    <span class="n">is_cs_true</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">signal_expected</span><span class="p">))</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">cluster</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">is_recovered</span><span class="p">,</span> <span class="n">is_cs_true</span><span class="p">,</span> <span class="n">is_top_true</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">purity</span>
 
 <span class="n">is_recovered</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -1085,7 +1087,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/5f6c9205b4886297170e454c0a5cbbfa0bae65eb/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 20:17:24 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/5f6c9205b4886297170e454c0a5cbbfa0bae65eb">revision 2, 5f6c920</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 21:51:14 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b">revision 3, 82e4ffc</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
