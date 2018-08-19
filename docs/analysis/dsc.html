@@ -259,7 +259,7 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We create genomic regions (fine-mapping analysis units) each containing 1,000 SNPs. Using real genotype data we retain the realistic LD pattern between SNPs.</p>
+<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We create genomic regions (fine-mapping analysis units) each containing 1,000 SNPs. Using real genotype data we retain the realistic LD pattern between SNPs. We analyze ~1,050 units (simulation replicates).</p>
 <h3 id="Simulation-of-phenotypes">Simulation of phenotypes<a class="anchor-link" href="#Simulation-of-phenotypes">&#182;</a></h3><p>We assume each analysis unit contains 1, 2, 3 or 4 causal variants. The genomic position of causal variants are simulated to associate with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome. (analysis performed by Min Qiao)</p>
 <p>Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside annotation regions,</p>
 <p>\begin{align}
@@ -362,7 +362,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
     <span class="n">exec_path</span><span class="p">:</span> <span class="n">modules</span>
     <span class="k">global</span><span class="p">:</span>
         <span class="n">data_file</span><span class="p">:</span> <span class="n">gtex</span><span class="o">-</span><span class="n">manifest</span><span class="o">.</span><span class="n">txt</span>
-        <span class="n">n_units</span><span class="p">:</span> <span class="mi">10</span>
+        <span class="n">n_units</span><span class="p">:</span> <span class="mi">150</span>
     <span class="n">output</span><span class="p">:</span> <span class="n">xh_grant</span>
 </pre></div>
 
@@ -750,7 +750,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_y</span><span class="o">.</span><span class="n">py</span>
@@ -1027,7 +1027,7 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
@@ -1087,7 +1087,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 21:51:14 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/82e4ffcd9cc4cfb5e7d5bf17eb925f4db7a8e24b">revision 3, 82e4ffc</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/dd6cea63bad78adbc0c0f3023c1a645f76376b55/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 00:06:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/dd6cea63bad78adbc0c0f3023c1a645f76376b55">revision 5, dd6cea6</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
