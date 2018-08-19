@@ -217,10 +217,6 @@ body {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         
-<li>
-  <a href="../analysis.html">Analysis</a>
-</li>
-        
       </ul>
         
 <ul class="nav navbar-nav navbar-right">
