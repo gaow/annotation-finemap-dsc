@@ -1,8 +1,7 @@
 analysis/xh_grant*
 **/*.dsc
-**/*.R
-**/*.py
-!docs/jnbinder.py
+analysis/**/*.R
+analysis/**/*.py
 **/.sos
 **/.ipynb_checkpoints
 **/__pycache__
