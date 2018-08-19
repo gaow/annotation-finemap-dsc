@@ -1,5 +1,5 @@
 #!/usr/bin/env sos-runner
-parameter: notebook = 'finemapping.ipynb'
+parameter: notebook = 'main.ipynb'
 
 [convert]
 input: notebook

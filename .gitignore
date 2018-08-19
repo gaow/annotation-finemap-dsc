@@ -1,0 +1,6 @@
+xh_grant*
+**/*.dsc
+**/*.R
+**/*.py
+**/.sos
+.ipynb_checkpoints/
