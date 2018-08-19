@@ -239,8 +239,17 @@ body {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This simulation study compares fine-mapping with use of annotations / without it, in terms of:</p>
 <ol>
-<li>Improvements in fine-mapping resolution: with the use of annotations we expect to provide smaller sets of candidate SNPs than without them.</li>
-<li>Improvements in power: the top signal from each candidate fine-mapping cluster is more likely to be the true causal signal when annotations are used.</li>
+<li>Improvements in power: the top signal from each candidate fine-mapping cluster is more likely to be the true causal signal when annotations are used.<ol>
+<li><strong>power</strong>: measures how many times the simulated signals ("singals" hereafter) are captured by fine-mapping clusters ("clusters" hereafter).</li>
+<li><strong>false discovery porportion</strong>: measures how many clusters do not capture any signal.</li>
+</ol>
+</li>
+<li>Improvements in fine-mapping resolution: with the use of annotations we expect to provide smaller sets of candidate SNPs than without them.<ol>
+<li><strong>top hit rate</strong>: measures how many times the top association from each cluster is in fact a signal.</li>
+<li><strong>size</strong>: median size of clusters, smaller size means higher resolution.</li>
+<li><strong>purity</strong>: average $r^2$ within clusters, higher $r^2$ means higher resolution.</li>
+</ol>
+</li>
 </ol>
 
 </div>
@@ -250,15 +259,16 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We choose common variants (MAF &gt; 1%). We create genomic regions (fine-mapping units) each containing 1,000 SNPs; thus retaining the realistic LD pattern between SNPs.</p>
-<h3 id="Phenotype-data">Phenotype data<a class="anchor-link" href="#Phenotype-data">&#182;</a></h3><p>We assume each analysis unit contains 1, 2, 3 or 4 causal variants. The genomic position of causal variants are simulated to associate with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome. For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the unit of interest. Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside these regions respectively,</p>
+<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We create genomic regions (fine-mapping analysis units) each containing 1,000 SNPs. Using real genotype data we retain the realistic LD pattern between SNPs.</p>
+<h3 id="Simulation-of-phenotypes">Simulation of phenotypes<a class="anchor-link" href="#Simulation-of-phenotypes">&#182;</a></h3><p>We assume each analysis unit contains 1, 2, 3 or 4 causal variants. The genomic position of causal variants are simulated to associate with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome. (analysis performed by Min Qiao)</p>
+<p>Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside annotation regions,</p>
 <p>\begin{align}
 \gamma &amp; = \frac{p_1/1-p_1}{p_0/1-p_0} \\
 L &amp; = [qp_1 + (1-q)p_0] \times N
 \end{align}</p>
-<p>where $\gamma$ is the mean odds ratio ($\gamma = 4.74$), $L$ is the number of causal variants in the region ($L = 1,2,3,4$), $N$ is total length of the region ($N=1000$), $q$ is proportion of annotation covered region ($q=0.1336$).</p>
-<p>To simulate phenotypes we assume for a causal variant an effect size $\beta_j \sim N(0, \sigma^2)$. We generate phenotype from a linear model $y=X\beta + E, E \sim N(0, \sigma_a^2)$. Relative strength of $\sigma^2$ and $\sigma_a$ are determined by percentage of variance explained (PVE) by all genetic effects. We set PVE to 0.1.</p>
-<h3 id="Caveats">Caveats<a class="anchor-link" href="#Caveats">&#182;</a></h3><p>Here we only have ~600 genotype samples to work with. Also we simulated quantitive phenotypes. The type of GWAS of interest here typically involves hundreds of thousands of samples with binary disease outcome. However we argue that in practice we work with summary statistics, which are typically z-scores whether they are from GWAS of disease phenotypes or quantitative traits. Although generated from ~600 sample, the observed effect sizes $\hat{\beta}$ should have similar "LD convoluted" structure as they are from larger samples. So our settings here should be good enough.</p>
+<p>where $\gamma$ is the mean odds ratio ($\gamma = 4.74$), $L$ is the number of causal variants in the region ($L = 1,2,3,4$), $N$ is total length of the region ($N=1000$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
+<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit. To simulate phenotypes we assume for a causal variant an effect size $\beta_j \sim N(0, \sigma^2)$. We generate phenotype from a linear model $y=X\beta + E, E \sim N(0, \sigma_a^2)$. Relative strength of $\sigma^2$ and $\sigma_a$ are determined by percentage of variance explained (PVE) by all genetic effects. We set PVE to 0.1.</p>
+<h3 id="Caveats">Caveats<a class="anchor-link" href="#Caveats">&#182;</a></h3><p>Here we only have ~600 genotype samples to work with. Also we simulated quantitive phenotypes. GWAS of interest typically involves hundreds of thousands of samples with binary disease outcome. However we argue that in practice we work with summary statistics, ie, z-scores and LD matrices, whose distribution under the null are the same for quantitative and case-control phenotypes. Also, although generated from ~600 sample, the observed effect sizes $\hat{\beta}$ should have similar "LD convoluted" structure as they are from larger samples, the main motivation we use real data genotypes even though the sample size is not large compared to typical GWAS analysis. I'm just arguing that our settings here should be good enough.</p>
 
 </div>
 </div>
@@ -267,7 +277,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Analysis">Analysis<a class="anchor-link" href="#Analysis">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
+<h2 id="Fine-mapping-method">Fine-mapping method<a class="anchor-link" href="#Fine-mapping-method">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
 
 </div>
 </div>
@@ -277,6 +287,9 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="DSC-benchmark">DSC benchmark<a class="anchor-link" href="#DSC-benchmark">&#182;</a></h2><p>Simulate study is implemented in DSC framework. Input data are just matrices of genotypes.</p>
+<p>To run the benchmark, first click inside SoS notebook "restart kernel and run all" botton. Then run the exported scripts with 8 CPU threads:</p>
+
+<pre><code>dsc master.dsc -c 8</code></pre>
 
 </div>
 </div>
@@ -590,7 +603,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="sim_prior.R"><code>sim_prior.R</code><a class="anchor-link" href="#sim_prior.R">&#182;</a></h3><p>From equations above, assuming $L=1$ we derive:</p>
+<h3 id="sim_prior.R"><code>sim_prior.R</code><a class="anchor-link" href="#sim_prior.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_1$. From equations above, assuming $L=1$ we derive:</p>
 <p>\begin{align}
 p_1 = \frac{\gamma p_0}{1 - p_0 + \gamma p_0} \\
 N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
@@ -1072,7 +1085,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/1bae3c18af30a7a8cb51b61690ca7d685ce88151/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 19:44:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/1bae3c18af30a7a8cb51b61690ca7d685ce88151">revision 1, 1bae3c1</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/5f6c9205b4886297170e454c0a5cbbfa0bae65eb/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sat Aug 18 20:17:24 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/5f6c9205b4886297170e454c0a5cbbfa0bae65eb">revision 2, 5f6c920</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
