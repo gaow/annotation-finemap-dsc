@@ -2,5 +2,7 @@ xh_grant*
 **/*.dsc
 **/*.R
 **/*.py
+!docs/jnbinder.py
 **/.sos
-.ipynb_checkpoints/
+**/.ipynb_checkpoints
+**/__pycache__
