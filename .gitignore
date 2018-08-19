@@ -1,4 +1,4 @@
-xh_grant*
+analysis/xh_grant*
 **/*.dsc
 **/*.R
 **/*.py

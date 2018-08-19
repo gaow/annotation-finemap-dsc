@@ -1,10 +1,10 @@
 name: 'Fine-mapping with annotations'
 repo: 'http://github.com/gaow/annotation-finemap-dsc'
 footer: "&copy 2018 Gao Wang at Stephens Lab, University of Chicago"
-include_dir: ['report']
+include_dir: ['analysis']
 # exclude_file: []
 # hide_navbar: []
-homepage: "main.ipynb"
+# homepage: "main.ipynb"
 # add_commit_info: True
 # disqus: NULL
 # release_message: NULL # type a release message to enable auto-commit, eg: "Build website via jnbinder"
