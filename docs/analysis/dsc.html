@@ -321,7 +321,7 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
 <p><strong>Update: the proper way to model polygenic effect is to use random effect model for SNPs, along the lines of GCTA paper, and summary statistics along the lines of RSS paper</strong>. Let $z_j$ be the true (standardized) effect size of SNP $j$, we have the prior distribution:</p>
 <p>$$z_j \sim (1-\pi) \delta_0 + \pi N(0, \sigma^2)$$</p>
-<p>For a causal SNP, the parameter $\sigma^2$ is related to PVE:</p>
+<p>For a causal SNP, the parameter $\sigma^2$ is related to PVE. Assuming all SNPs contribute equally,</p>
 <p>$$PVE_j = \frac{\sigma^2}{N}$$</p>
 <p>so for our data $\sigma = \sqrt{PVE_j \times N} = 3.27$. In my implementation below, for $j \in C$ instead of setting it to fixed value $\pm 3.27$, I draw it from $N(0, 3.27^2)$.</p>
 <h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In practice columns of $X$ are correlated due to LD. Observed GWAS z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
@@ -333,14 +333,15 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create ~2,000 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, ~2,000 simulations of different underlying LD structure. Each chunk should have one or more LD blocks. The exact positions these causal variants occur are associated with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome.</p>
-<p>Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside annotation regions,</p>
+<h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create ~2,000 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, ~2,000 simulations of different underlying LD structure. Each unit should have one or more LD blocks. We assume one causal variant per unit. The exact positions these causal variants occur are associated with genomic annotations.</p>
+<p>Suppose we have $K$ non-overlapping, independent annotation regions. Let $p_k$ and $p_0$ denote causal probability of SNPs inside and outside annotation $k$'s region.</p>
 <p>\begin{align}
-\gamma &amp; = \frac{p_1/1-p_1}{p_0/1-p_0} \\
-L &amp; = [qp_1 + (1-q)p_0] \times M
+\gamma_k &amp; = \frac{p_k/1-p_k}{p_0/1-p_0} \\
+L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 \end{align}</p>
-<p>where $\gamma$ is the mean odds ratio (we try $\gamma = 3, 4.5, 6$), $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
-<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit. Also we only simulate one causal per unit, $L = 1$.</p>
+<p>where $\gamma_k$ is the odds ratio for annotation $k$ obtained from enrichment analysis, $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
+<h4 id="atac-seq-annotations">atac-seq annotations<a class="anchor-link" href="#atac-seq-annotations">&#182;</a></h4><p>From previous enrichment analysis of 5 atac-seq annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. We can try $\gamma_1 = 3, 4.5, 6$. The 5 annotations, when combined, physically cover a total of 13.36% of the genome. The average size of the combined peaks is 576; thus iff we assume uniform distribution of peaks over the uniformally distributed 1 million variants we test the consective annotated region should be less than 1. In that case we'll simply assign 13.36% variants in an analysis unit to fall in the annotation, without worrying about their consectiveness.</p>
+<h4 id="Allele-specific-chromatin-accessability-(ASCA)-annotations">Allele-specific chromatin accessability (ASCA) annotations<a class="anchor-link" href="#Allele-specific-chromatin-accessability-(ASCA)-annotations">&#182;</a></h4><p>From previous enrichment analysis of ASCA we have odds ratio of 55 for ASCA variants with FDR &lt; 0.05. On average 5% variants in each atac-seq peak are ASCA. To add in this annotation, for simplicity we now assume 12.69% variants are atac-seq annotations, 0.66% are ASCA.</p>
 
 </div>
 </div>
@@ -482,17 +483,15 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
                                   <span class="n">X</span> <span class="o">=</span> <span class="n">get_loci</span><span class="p">(</span><span class="n">data</span><span class="err">$</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">);</span>
                                   <span class="n">R</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="nb">round</span><span class="p">(</span><span class="n">cor</span><span class="p">(</span><span class="n">X</span><span class="p">[[</span><span class="n">i</span><span class="p">]]),</span><span class="mi">4</span><span class="p">));</span>
                                   <span class="n">eff_sign</span> <span class="o">=</span> <span class="n">get_sign</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
-                                  <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">);</span>
+                                  <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">);</span>
                                   <span class="n">status</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">R</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span><span class="n">paste0</span><span class="p">(</span><span class="n">ld_file</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)))</span>                           
   <span class="n">dataset</span><span class="p">:</span> <span class="n">Shell</span><span class="p">{</span><span class="n">head</span> <span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">n_units</span><span class="p">}</span> <span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">}}</span>
   <span class="n">M</span><span class="p">:</span> <span class="mi">500</span>
-  <span class="n">chunks</span><span class="p">:</span> <span class="mi">5</span>
-  <span class="n">g</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">6</span>
-  <span class="n">q</span><span class="p">:</span> <span class="mf">0.1336</span>
+  <span class="n">g</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">55</span><span class="p">)</span>
+  <span class="n">q</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.00668</span><span class="p">)</span>
   <span class="err">$</span><span class="n">eff_sign</span><span class="p">:</span> <span class="n">eff_sign</span>
   <span class="err">$</span><span class="n">R</span><span class="p">:</span> <span class="n">R</span>
   <span class="err">$</span><span class="n">prior</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">prior</span>
-  <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
   <span class="err">$</span><span class="n">ld_file</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">ld</span><span class="p">)</span>
 </pre></div>
 
@@ -682,10 +681,10 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="sim_region.R"><code>sim_region.R</code><a class="anchor-link" href="#sim_region.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_1$. From equations above, assuming $L=1$ we derive:</p>
+<h3 id="sim_region.R"><code>sim_region.R</code><a class="anchor-link" href="#sim_region.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_k$. From equations above, for $L=1$ we derive:</p>
 <p>\begin{align}
-p_1 = \frac{\gamma p_0}{1 - p_0 + \gamma p_0} \\
-M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
+p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
+[\sum_k q_k \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} + (1-\sum_k q_k)p_0] \times M - 1 = 0
 \end{align}</p>
 <p>We can solve this numerically in R, eg:</p>
 
@@ -697,13 +696,13 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.5</span>
-<span class="n">N</span> <span class="o">=</span> <span class="mi">500</span>
-<span class="n">q</span> <span class="o">=</span> <span class="mf">0.1336</span>
-<span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">g</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">N</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">+</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mf">4.5</span><span class="p">,</span> <span class="mi">55</span><span class="p">)</span>
+<span class="n">M</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">q</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.0066</span><span class="p">)</span>
+<span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">uniroot</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="o">.</span><span class="n">Machine</span><span class="err">$</span><span class="n">double</span><span class="o">.</span><span class="n">eps</span><span class="o">^</span><span class="mf">0.8</span><span class="p">)</span><span class="err">$</span><span class="n">root</span>
 <span class="n">p1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="o">+</span><span class="n">g</span><span class="o">*</span><span class="n">p0</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span><span class="n">p1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -720,7 +719,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 0.001365430 0.006115208
+<pre>[1] 0.001125165 0.005043379 0.058339412
 </pre>
 </div>
 </div>
@@ -736,7 +735,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># verify it:</span>
 <span class="k">print</span><span class="p">(</span><span class="n">p1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="p">)))</span>
-<span class="k">print</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">q</span> <span class="o">*</span> <span class="n">p1</span> <span class="o">+</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">q</span><span class="p">)</span> <span class="o">*</span> <span class="n">p0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="o">*</span> <span class="n">p0</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -753,7 +752,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 4.5
+<pre>[1]  4.5 55.0
 [1] 1
 </pre>
 </div>
@@ -767,7 +766,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>These probabilities recover the odds ratio, so we should be good. I'll use this in my simulation code below.</p>
+<p>These probabilities recover the odds ratio, so we should be good. I'll use it in my codes below.</p>
 
 </div>
 </div>
@@ -782,16 +781,19 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
     <span class="n">segs</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
     <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">segs</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">X</span><span class="p">[,</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
 <span class="p">}</span>
-<span class="n">get_prior</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="p">{</span>
-    <span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">g</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">N</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">+</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
+<span class="n">get_prior</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">g</span> <span class="o">*</span> <span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">x</span> <span class="o">+</span> <span class="n">g</span> <span class="o">*</span> <span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="o">*</span> <span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
     <span class="n">p0</span> <span class="o">=</span> <span class="n">uniroot</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="o">.</span><span class="n">Machine</span><span class="err">$</span><span class="n">double</span><span class="o">.</span><span class="n">eps</span><span class="o">^</span><span class="mf">0.8</span><span class="p">)</span><span class="err">$</span><span class="n">root</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">g</span> <span class="o">*</span> <span class="n">p0</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">p0</span><span class="o">+</span><span class="n">g</span><span class="o">*</span><span class="n">p0</span><span class="p">)</span>
-    <span class="n">per_chunk_len</span> <span class="o">=</span> <span class="n">N</span> <span class="o">*</span> <span class="n">q</span> <span class="o">/</span> <span class="n">chunks</span>
-    <span class="n">n_bins</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">N</span><span class="o">/</span><span class="n">chunks</span><span class="p">)</span>
-    <span class="n">annotated</span> <span class="o">=</span> <span class="n">unlist</span><span class="p">(</span><span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">chunks</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="p">((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):((</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">n_bins</span> <span class="o">+</span> <span class="n">per_chunk_len</span><span class="p">)))</span>
-    <span class="n">prior</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-    <span class="n">prior</span><span class="p">[</span><span class="n">annotated</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1</span>                          
-    <span class="nb">list</span><span class="p">(</span><span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">annotated</span><span class="p">)</span>                          
+    <span class="n">n_anns</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span>
+    <span class="n">annotated</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">n_anns</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">sample</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n_anns</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">rep</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span> <span class="o">-</span> <span class="n">n_anns</span><span class="p">[</span><span class="n">i</span><span class="p">]))))</span>
+    <span class="n">prior</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="n">annotation</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">p1</span><span class="p">))</span> <span class="p">{</span>
+        <span class="n">prior</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">annotated</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p1</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">annotation</span> <span class="o">=</span> <span class="n">annotation</span> <span class="o">+</span> <span class="n">annotated</span><span class="p">[[</span><span class="n">i</span><span class="p">]]</span>
+    <span class="p">}</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">annotation</span><span class="p">)</span>   
 <span class="p">}</span>
 <span class="n">get_sign</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="nb">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span> <span class="mi">2</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="k">as</span><span class="o">.</span><span class="n">integer</span><span class="p">((</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)))</span>
@@ -1088,7 +1090,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b7d26e5fa17bb839657dedd028004fd04e0a97b1/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 12:06:42 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b7d26e5fa17bb839657dedd028004fd04e0a97b1">revision 16, b7d26e5</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/260c8a72957f75b57b40d2c17b3037bb22007697/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 15:37:44 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/260c8a72957f75b57b40d2c17b3037bb22007697">revision 17, 260c8a7</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
