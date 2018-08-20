@@ -1,3 +1,3 @@
 var analysisArray = ['dsc', 'report']
-var analysisDict = {'dat-dscrutils:::read-dsc(-xh-grant-simulate-z-simulate-region-97-simulate-z-1.pkl-)-1': 'Untitled', 'Annotation-enhanced-genetic-fine-mapping-1': 'dsc', 'Performance-of-annotation-enhanced-fine-mapping-1': 'report'}
-var analysisArrayMap = {'Untitled': "dat = dscrutils:::read_ ... te_z_1.pkl')", 'dsc': 'Annotation enhanced gen ... fine-mapping', 'report': 'Performance of annotati ... fine-mapping'}
+var analysisDict = {'Annotation-enhanced-genetic-fine-mapping-1': 'dsc', 'Performance-of-annotation-enhanced-fine-mapping-1': 'report'}
+var analysisArrayMap = {'dsc': 'Annotation enhanced gen ... fine-mapping', 'report': 'Performance of annotati ... fine-mapping'}

@@ -319,6 +319,12 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
 \end{align}</p>
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
+<p><strong>Update: the proper way to model polygenic effect is to use random effect model for SNPs, along the lines of GCTA paper, and summary statistics along the lines of RSS paper</strong>. Here in brief:</p>
+<p>Let $z_j$ be the true (standardized) effect size of SNP $j$, we have the prior distribution:</p>
+<p>$$z_j \sim (1-\pi) \delta_0 + \pi N(0, \sigma^2)$$</p>
+<p>For a causal SNP, the parameter $\sigma^2$ is related to PVE:</p>
+<p>$$PVE_j = \frac{\sigma^2}{N}$$</p>
+<p>so for our data $\sigma = \sqrt{PVE_j \times N} = 3.27$. In my implementation below, for $j \in C$ instead of setting it to fixed value $\pm 3.27$, I draw it from $N(0, 3.27^2)$.</p>
 <h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In practice columns of $X$ are correlated due to LD. Observed GWAS z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
 
 </div>
@@ -1081,7 +1087,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/e403fffe6744c061e2a21f6d174b11422f63b357/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 11:32:45 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/e403fffe6744c061e2a21f6d174b11422f63b357">revision 14, e403fff</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b5d9e932d0769ce92cd4e807d4b764c2117453ef/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 12:03:34 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b5d9e932d0769ce92cd4e807d4b764c2117453ef">revision 15, b5d9e93</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
