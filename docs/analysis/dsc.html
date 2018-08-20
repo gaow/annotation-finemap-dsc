@@ -341,7 +341,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 \end{align}</p>
 <p>where $\gamma_k$ is the odds ratio for annotation $k$ obtained from enrichment analysis, $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
 <h4 id="atac-seq-annotations">atac-seq annotations<a class="anchor-link" href="#atac-seq-annotations">&#182;</a></h4><p>From previous enrichment analysis of 5 atac-seq annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. We can try $\gamma_1 = 3, 4.5, 6$. The 5 annotations, when combined, physically cover a total of 13.36% of the genome. The average size of the combined peaks is 576; thus iff we assume uniform distribution of peaks over the uniformally distributed 1 million variants we test the consective annotated region should be less than 1. In that case we'll simply assign 13.36% variants in an analysis unit to fall in the annotation, without worrying about their consectiveness.</p>
-<h4 id="Allele-specific-chromatin-accessability-(ASCA)-annotations">Allele-specific chromatin accessability (ASCA) annotations<a class="anchor-link" href="#Allele-specific-chromatin-accessability-(ASCA)-annotations">&#182;</a></h4><p>From previous enrichment analysis of ASCA we have odds ratio of 55 for ASCA variants with FDR &lt; 0.05. On average 5% variants in each atac-seq peak are ASCA. To add in this annotation, for simplicity we now assume 12.69% variants are atac-seq annotations, 0.66% are ASCA.</p>
+<h4 id="Allele-specific-chromatin-accessability-(ASCA)-annotations">Allele-specific chromatin accessability (ASCA) annotations<a class="anchor-link" href="#Allele-specific-chromatin-accessability-(ASCA)-annotations">&#182;</a></h4><p>From previous enrichment analysis of ASCA we have odds ratio of $\gamma_2 = 55$ for ASCA variants with FDR &lt; 0.05. On average 5% variants in each atac-seq peak are ASCA. To add in this annotation, for simplicity we now assume 12.69% variants are atac-seq annotations, 0.66% are ASCA.</p>
 
 </div>
 </div>
@@ -492,6 +492,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="err">$</span><span class="n">eff_sign</span><span class="p">:</span> <span class="n">eff_sign</span>
   <span class="err">$</span><span class="n">R</span><span class="p">:</span> <span class="n">R</span>
   <span class="err">$</span><span class="n">prior</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">prior</span>
+  <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
   <span class="err">$</span><span class="n">ld_file</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">ld</span><span class="p">)</span>
 </pre></div>
 
@@ -1090,7 +1091,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/260c8a72957f75b57b40d2c17b3037bb22007697/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 15:37:44 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/260c8a72957f75b57b40d2c17b3037bb22007697">revision 17, 260c8a7</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/713464d19e937de2ea8ce0a8a2615dd002e736c5/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 16:20:28 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/713464d19e937de2ea8ce0a8a2615dd002e736c5">revision 18, 713464d</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
