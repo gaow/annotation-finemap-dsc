@@ -319,7 +319,7 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
 \end{align}</p>
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
-<h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In GWAS, observed z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(Z, R^2)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix.</p>
+<h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In GWAS, observed z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
 
 </div>
 </div>
@@ -328,14 +328,14 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create ~2,000 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, ~2,000 simulations of different underlying LD structure. Each chunk should have muliple LD blocks. Under this setting the average number of causal SNPs within each region is 3 ($500 \times 0.006$). The exact positions these causal variants occur are associated with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome.</p>
+<h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create ~2,000 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, ~2,000 simulations of different underlying LD structure. Each chunk should have one or more LD blocks. The exact positions these causal variants occur are associated with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome.</p>
 <p>Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside annotation regions,</p>
 <p>\begin{align}
 \gamma &amp; = \frac{p_1/1-p_1}{p_0/1-p_0} \\
 L &amp; = [qp_1 + (1-q)p_0] \times M
 \end{align}</p>
-<p>where $\gamma$ is the mean odds ratio (we try $\gamma = 3, 4.5, 6$), $L$ is the number of causal variants in the region ($L = 3$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
-<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit.</p>
+<p>where $\gamma$ is the mean odds ratio (we try $\gamma = 3, 4.5, 6$), $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
+<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit. Also we only simulate one causal per unit, $L = 1$.</p>
 
 </div>
 </div>
@@ -345,6 +345,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Fine-mapping-method">Fine-mapping method<a class="anchor-link" href="#Fine-mapping-method">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
+<p>To speed up DAP computations we set its <code>-msize</code> parameter to the oracle number $L$.</p>
 
 </div>
 </div>
@@ -371,7 +372,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">zzz</span><span class="o">.</span><span class="n">dsc</span>
@@ -382,6 +383,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/zzz.dsc" target="_blank">modules/zzz.dsc</a></div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -396,7 +416,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">master</span><span class="o">.</span><span class="n">dsc</span>
@@ -418,6 +438,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="master.dsc" target="_blank">master.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -429,7 +468,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_region</span><span class="o">.</span><span class="n">dsc</span>
@@ -456,6 +495,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_region.dsc" target="_blank">modules/simulate_region.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -467,7 +525,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_z</span><span class="o">.</span><span class="n">dsc</span>
@@ -487,6 +545,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_z.dsc" target="_blank">modules/simulate_z.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -498,7 +575,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span><span class="o">.</span><span class="n">dsc</span>
@@ -519,6 +596,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/fit.dsc" target="_blank">modules/fit.dsc</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -530,7 +626,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span><span class="o">.</span><span class="n">dsc</span>
@@ -546,6 +642,25 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/evaluate.dsc" target="_blank">modules/evaluate.dsc</a></div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -574,7 +689,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.5</span>
@@ -590,10 +705,28 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] 0.001365430 0.006115208
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># verify it:</span>
@@ -602,6 +735,25 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[1] 4.5
+[1] 1
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -617,7 +769,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_region</span><span class="o">.</span><span class="n">R</span>
@@ -645,6 +797,25 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/sim_region.R" target="_blank">modules/sim_region.R</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -656,7 +827,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_z</span><span class="o">.</span><span class="n">py</span>
@@ -684,6 +855,25 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/sim_z.py" target="_blank">modules/sim_z.py</a></div>
+</div>
+
+</div>
+
 </div>
 </div>
 
@@ -737,7 +927,7 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span>
@@ -801,6 +991,25 @@ Independent association signal clusters
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/fit_dap.py" target="_blank">modules/fit_dap.py</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -812,7 +1021,7 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
@@ -850,10 +1059,29 @@ Independent association signal clusters
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">Cell content saved to <a href="modules/evaluate_dap.py" target="_blank">modules/evaluate_dap.py</a></div>
+</div>
+
+</div>
+
+</div>
+</div>
+
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/d6488313f7e69fc5adf45b47a7bf46ab2b0353e3/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 10:09:51 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/d6488313f7e69fc5adf45b47a7bf46ab2b0353e3">revision 12, d648831</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/be5891b838e2e36e1fdd264e193074d2f6d1d94a/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 10:55:06 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/be5891b838e2e36e1fdd264e193074d2f6d1d94a">revision 13, be5891b</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
