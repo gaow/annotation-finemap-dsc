@@ -312,10 +312,11 @@ var(X_j\beta_j) &amp;= \beta_j^2var(X_j) \\
 &amp;= \frac{1}{Nvar({X_j})} \\
 &amp;= \frac{1}{2Nf_j(1-f_j)}
 \end{align}</p>
-<p>The sample size $N$, for SCZ GWAS studies Hence the z-score summary statistic for causal SNP $j$ is</p>
+<p>The sample size $N$, for SCZ GWAS study here is 80K. Hence the z-score summary statistic for causal SNP $j$ is set to</p>
 <p>\begin{align}
 z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
-&amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \sqrt{N \times PVE_j}
+&amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \sqrt{N \times PVE_j} \\
+&amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
 \end{align}</p>
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
 <h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In GWAS, observed z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(Z, R^2)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix.</p>
@@ -476,7 +477,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
                                   <span class="n">R</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="nb">round</span><span class="p">(</span><span class="n">cor</span><span class="p">(</span><span class="n">X</span><span class="p">[[</span><span class="n">i</span><span class="p">]]),</span><span class="mi">4</span><span class="p">));</span>
                                   <span class="n">eff_sign</span> <span class="o">=</span> <span class="n">get_sign</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
                                   <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">);</span>
-                                  <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">R</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span><span class="n">paste0</span><span class="p">(</span><span class="n">ld_file</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)))</span>                           
+                                  <span class="n">status</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">R</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span><span class="n">paste0</span><span class="p">(</span><span class="n">ld_file</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)))</span>                           
   <span class="n">dataset</span><span class="p">:</span> <span class="n">Shell</span><span class="p">{</span><span class="n">head</span> <span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">n_units</span><span class="p">}</span> <span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">}}</span>
   <span class="n">M</span><span class="p">:</span> <span class="mi">500</span>
   <span class="n">chunks</span><span class="p">:</span> <span class="mi">5</span>
@@ -523,7 +524,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_z</span><span class="o">.</span><span class="n">dsc</span>
@@ -1076,7 +1077,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/1bbac3b42e1e3ac0eba4d04edf81301a2cb27552/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 19:41:12 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/1bbac3b42e1e3ac0eba4d04edf81301a2cb27552">revision 7, 1bbac3b</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/34929168a556bb1ec027ac46db87d693e4add480/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 20:22:23 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/34929168a556bb1ec027ac46db87d693e4add480">revision 8, 3492916</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
