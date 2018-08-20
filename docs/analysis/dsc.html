@@ -284,9 +284,9 @@ body {
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Simulation-of-expected-z-scores">Simulation of expected z-scores<a class="anchor-link" href="#Simulation-of-expected-z-scores">&#182;</a></h3><p>We generate from standard univariate linear regression,</p>
 <p>\begin{align}
-y=X\beta + E, E \sim N(0, \sigma_a^2).
+y=X\beta + E, E \sim N(0, \sigma_a^2),
 \end{align}</p>
-<p>Percentage of variance explained, assuming additive polygenic effects:</p>
+<p>where both $X$ and $y$ are centered thus absence of the intercept term. Percentage of variance explained, assuming additive polygenic effects:</p>
 <p>\begin{align}
 PVE &amp; = \frac{var(X\beta)}{var(y)} \\
 &amp; = \sum_{j\in C} \frac{var(X_j\beta_j)}{var(y)} \\
@@ -371,7 +371,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">zzz</span><span class="o">.</span><span class="n">dsc</span>
@@ -382,25 +382,6 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/zzz.dsc" target="_blank">modules/zzz.dsc</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -415,7 +396,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">master</span><span class="o">.</span><span class="n">dsc</span>
@@ -437,25 +418,6 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="master.dsc" target="_blank">master.dsc</a></div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -467,7 +429,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_region</span><span class="o">.</span><span class="n">dsc</span>
@@ -494,25 +456,6 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/simulate_region.dsc" target="_blank">modules/simulate_region.dsc</a></div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -524,7 +467,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_z</span><span class="o">.</span><span class="n">dsc</span>
@@ -533,7 +476,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
   <span class="n">eff_sign</span><span class="p">:</span> <span class="err">$</span><span class="n">eff_sign</span>
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
   <span class="n">N</span><span class="p">:</span> <span class="mi">80000</span>
-  <span class="n">n_signal</span><span class="p">:</span> <span class="mi">3</span>
+  <span class="n">n_signal</span><span class="p">:</span> <span class="mi">1</span>
   <span class="n">pve</span><span class="p">:</span> <span class="mf">1.34E-4</span>
   <span class="err">$</span><span class="n">z</span><span class="p">:</span> <span class="n">z</span>
   <span class="err">$</span><span class="n">z_true</span><span class="p">:</span> <span class="n">z_true</span>
@@ -541,25 +484,6 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/simulate_z.dsc" target="_blank">modules/simulate_z.dsc</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -574,42 +498,24 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span><span class="o">.</span><span class="n">dsc</span>
 
-<span class="kn">dap:</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+<span class="kn">dap:</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
   <span class="n">ld</span><span class="p">:</span> <span class="err">$</span><span class="n">ld_file</span>
   <span class="n">z</span><span class="p">:</span> <span class="err">$</span><span class="n">z</span>
+  <span class="n">L</span><span class="p">:</span> <span class="err">$</span><span class="n">L</span>
   <span class="n">args</span><span class="p">:</span> <span class="s2">&quot;-ld_control 0.20 --all&quot;</span>
   <span class="n">cache</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">DAP</span><span class="p">)</span>
   <span class="err">$</span><span class="n">posterior</span><span class="p">:</span> <span class="n">posterior</span>
 
-<span class="n">dapa</span><span class="p">(</span><span class="n">dap</span><span class="p">):</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+<span class="n">dapa</span><span class="p">(</span><span class="n">dap</span><span class="p">):</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/fit.dsc" target="_blank">modules/fit.dsc</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -624,7 +530,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span><span class="o">.</span><span class="n">dsc</span>
@@ -640,25 +546,6 @@ L &amp; = [qp_1 + (1-q)p_0] \times M
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/evaluate.dsc" target="_blank">modules/evaluate.dsc</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -687,7 +574,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.5</span>
@@ -703,28 +590,10 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 0.001365430 0.006115208
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[8]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># verify it:</span>
@@ -733,25 +602,6 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 4.5
-[1] 1
-</pre>
-</div>
-</div>
-
 </div>
 </div>
 
@@ -767,7 +617,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[9]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_region</span><span class="o">.</span><span class="n">R</span>
@@ -795,25 +645,6 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/sim_region.R" target="_blank">modules/sim_region.R</a></div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -825,7 +656,7 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[10]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_z</span><span class="o">.</span><span class="n">py</span>
@@ -834,14 +665,14 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 <span class="k">def</span> <span class="nf">sim_gwas_z</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
     <span class="c1"># get expected z-score assuming all causal</span>
-    <span class="n">z_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">pve</span><span class="p">)</span> <span class="o">*</span> <span class="n">eff_sign</span>
+    <span class="n">z_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">pve</span><span class="p">))</span> <span class="o">*</span> <span class="n">eff_sign</span>
     <span class="c1"># sparsify expected z-score to allow for n_signal causal</span>
     <span class="c1"># FIXME: might overlap if some prior is very high; </span>
     <span class="c1"># thus not gauranteed to have exactly n_signal non-zeros</span>
     <span class="c1"># but it is quite convenient to call this function</span>
     <span class="n">z_true</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
     <span class="c1"># get observed z-scores</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">z_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">R</span> <span class="err">@</span> <span class="n">z_true</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_true</span>
 
 <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
@@ -853,25 +684,6 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/sim_z.py" target="_blank">modules/sim_z.py</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -925,7 +737,7 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[11]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span>
@@ -943,10 +755,12 @@ Independent association signal clusters
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;{i+1}</span><span class="se">\t</span><span class="s1">{p}&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prior</span><span class="p">)]))</span>
 
-<span class="k">def</span> <span class="nf">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dap-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-d_z&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.z&#39;</span><span class="p">,</span> <span class="s1">&#39;-d_ld&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{ld}.{r}&#39;</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">,</span> <span class="s1">&#39;--output_all&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">L</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-msize&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">L</span><span class="p">)])</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>    
     
 <span class="k">def</span> <span class="nf">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
@@ -971,38 +785,19 @@ Independent association signal clusters
     <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">pips</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;cluster&#39;</span><span class="p">])[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">on</span> <span class="o">=</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;snp&#39;</span><span class="p">:</span> <span class="n">pips</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span> <span class="n">clusters</span><span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">dap_single_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">dap_single_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">write_dap_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">prefix</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">write_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
-    <span class="n">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="n">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">dap_batch_z</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single_z</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">ld</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Z</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">dap_batch_z</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single_z</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Z</span><span class="p">])</span>
 </pre></div>
 
 </div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/fit_dap.py" target="_blank">modules/fit_dap.py</a></div>
-</div>
-
-</div>
-
 </div>
 </div>
 
@@ -1017,12 +812,12 @@ Independent association signal clusters
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[12]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
-<span class="k">def</span> <span class="nf">dap_summary</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">coef</span><span class="p">):</span>
-    <span class="n">signal_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{idx+1}&#39;</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">dap_summary</span><span class="p">(</span><span class="n">cluster</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">z_true</span><span class="p">):</span>
+    <span class="n">signal_expected</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{idx+1}&#39;</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">z_true</span><span class="p">)</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
     <span class="n">cluster</span> <span class="o">=</span> <span class="n">cluster</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">cluster</span><span class="p">[</span><span class="s1">&#39;cluster_prob&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.95</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">cluster</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;failed&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
@@ -1048,36 +843,17 @@ Independent association signal clusters
 <span class="n">size</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="n">purity</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">posterior</span><span class="p">:</span>
-    <span class="n">is_recovered</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_cs_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_top_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">purity</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dap_summary</span><span class="p">(</span><span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;set&#39;</span><span class="p">],</span> <span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;snp&#39;</span><span class="p">],</span> <span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+    <span class="n">is_recovered</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_cs_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_top_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">purity</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dap_summary</span><span class="p">(</span><span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;set&#39;</span><span class="p">],</span> <span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;snp&#39;</span><span class="p">],</span> <span class="n">z_true</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area">
-
-<div class="prompt"></div>
-
-
-
-<div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/evaluate_dap.py" target="_blank">modules/evaluate_dap.py</a></div>
-</div>
-
-</div>
-
-</div>
-</div>
-
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/34929168a556bb1ec027ac46db87d693e4add480/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 20:22:23 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/34929168a556bb1ec027ac46db87d693e4add480">revision 8, 3492916</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/d6488313f7e69fc5adf45b47a7bf46ab2b0353e3/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 10:09:51 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/d6488313f7e69fc5adf45b47a7bf46ab2b0353e3">revision 12, d648831</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
