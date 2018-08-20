@@ -2,16 +2,19 @@ get_loci = function(X, N) {
     segs = floor(ncol(X) / N)
     lapply(1:segs, function(i) X[,i:(i+N-1)])
 }
-get_prior = function(N, chunks, g, q) {
-    foo = function(x) N * (q-1-g*q+g) * x^2 - (N*q-N-N*q*g+g-1) * x - 1
+get_prior = function(M, g, q) {
+    foo = function(x) M * (sum(q * g * x / (1 - x + g * x)) + (1 - sum(q)) * x) - 1
     p0 = uniroot(foo, lower=0, upper=1, tol = .Machine$double.eps^0.8)$root
     p1 = g * p0 / (1-p0+g*p0)
-    per_chunk_len = N * q / chunks
-    n_bins = floor(N/chunks)
-    annotated = unlist(lapply(1:chunks, function(i) ((i-1) * n_bins + 1):((i-1) * n_bins + per_chunk_len)))
-    prior = rep(p0, N)
-    prior[annotated] = p1                          
-    list(prior=prior, annotation=annotated)                          
+    n_anns = floor(M * q)
+    annotated = lapply(1:length(n_anns), function(i) sample(c(rep(1,n_anns[i]), rep(0, M - n_anns[i]))))
+    prior = rep(p0, M)
+    annotation = rep(0, M)
+    for (i in 1:length(p1)) {
+        prior[which(annotated[[i]] == 1)] = p1[i]
+        annotation = annotation + annotated[[i]]
+    }
+    list(prior=prior, annotation=annotation)   
 }
 get_sign = function(X) {
     lapply(1:length(X), function(i) apply(X[[i]], 2, function(x) (-1)^as.integer((mean(x)/2) > 0.5)))

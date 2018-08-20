@@ -3,6 +3,8 @@ import numpy as np
 def sim_gwas_z(R, N, pve, eff_sign, n_signal, prior):
     np.random.seed(int(np.sum(np.array(R))))
     # get expected z-score assuming all causal
+    # it really does not matter to our purpose whether Z is positive or negative
+    # because it is only a matter of allele coding ...
     z_true = np.random.normal(0, np.sqrt(N * pve)) * eff_sign
     # sparsify expected z-score to allow for n_signal causal
     # FIXME: might overlap if some prior is very high; 
