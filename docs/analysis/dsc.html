@@ -319,8 +319,7 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
 \end{align}</p>
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
-<p><strong>Update: the proper way to model polygenic effect is to use random effect model for SNPs, along the lines of GCTA paper, and summary statistics along the lines of RSS paper</strong>. Here in brief:</p>
-<p>Let $z_j$ be the true (standardized) effect size of SNP $j$, we have the prior distribution:</p>
+<p><strong>Update: the proper way to model polygenic effect is to use random effect model for SNPs, along the lines of GCTA paper, and summary statistics along the lines of RSS paper</strong>. Let $z_j$ be the true (standardized) effect size of SNP $j$, we have the prior distribution:</p>
 <p>$$z_j \sim (1-\pi) \delta_0 + \pi N(0, \sigma^2)$$</p>
 <p>For a causal SNP, the parameter $\sigma^2$ is related to PVE:</p>
 <p>$$PVE_j = \frac{\sigma^2}{N}$$</p>
@@ -842,6 +841,8 @@ M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 <span class="k">def</span> <span class="nf">sim_gwas_z</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
     <span class="c1"># get expected z-score assuming all causal</span>
+    <span class="c1"># it really does not matter to our purpose whether Z is positive or negative</span>
+    <span class="c1"># because it is only a matter of allele coding ...</span>
     <span class="n">z_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">pve</span><span class="p">))</span> <span class="o">*</span> <span class="n">eff_sign</span>
     <span class="c1"># sparsify expected z-score to allow for n_signal causal</span>
     <span class="c1"># FIXME: might overlap if some prior is very high; </span>
@@ -1087,7 +1088,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b5d9e932d0769ce92cd4e807d4b764c2117453ef/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 12:03:34 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b5d9e932d0769ce92cd4e807d4b764c2117453ef">revision 15, b5d9e93</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b7d26e5fa17bb839657dedd028004fd04e0a97b1/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 12:06:42 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b7d26e5fa17bb839657dedd028004fd04e0a97b1">revision 16, b7d26e5</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
