@@ -1,7 +1,4 @@
 analysis/xh_grant*
-**/*.dsc
-analysis/**/*.R
-analysis/**/*.py
 **/.sos
 **/.ipynb_checkpoints
 **/__pycache__
