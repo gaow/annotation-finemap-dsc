@@ -306,7 +306,7 @@ var(X_j\beta_j) &amp;= \beta_j^2var(X_j) \\
 \beta_j &amp;= -1^{\mathbb{1}[f_j&lt;0.5]}\sqrt{\frac{PVE_j}{2f_j(1-f_j)}}
 \end{align}</p>
 <p>that is, under conventional genotype coding of 0 for major and 1 for minor allele, the direction of effect size $\beta_j$ is positive if the causal allele is a minor allele.</p>
-<p>Estimate of effect size follows distribution $\hat{\beta}_j \sim N(\beta_j, \sigma_j^2)$, where the variance for BLUE of $\beta$,</p>
+<p>If columns of $X$ are independent, estimate of effect size follows distribution $\hat{\beta}_j \sim N(\beta_j, \sigma_j^2)$, where the variance for BLUE of $\beta$,</p>
 <p>\begin{align}
 \sigma_j^2 &amp;= \frac{var(y)}{Nvar({X_j})} \\
 &amp;= \frac{1}{Nvar({X_j})} \\
@@ -319,7 +319,7 @@ z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
 \end{align}</p>
 <p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
-<h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In GWAS, observed z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
+<h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In practice columns of $X$ are correlated due to LD. Observed GWAS z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
 
 </div>
 </div>
@@ -1081,7 +1081,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/be5891b838e2e36e1fdd264e193074d2f6d1d94a/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 10:55:06 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/be5891b838e2e36e1fdd264e193074d2f6d1d94a">revision 13, be5891b</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/e403fffe6744c061e2a21f6d174b11422f63b357/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Mon Aug 20 11:32:45 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/e403fffe6744c061e2a21f6d174b11422f63b357">revision 14, e403fff</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
