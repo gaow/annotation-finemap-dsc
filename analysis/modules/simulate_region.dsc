@@ -12,4 +12,5 @@ simulate_region: sim_region.R + R(data = readRDS(dataset);
   $eff_sign: eff_sign
   $R: R
   $prior: prior$prior
+  $annotation: prior$annotation
   $ld_file: file(ld)
