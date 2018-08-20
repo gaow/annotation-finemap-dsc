@@ -239,16 +239,16 @@ body {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This simulation study compares fine-mapping with use of annotations / without it, in terms of:</p>
 <ol>
-<li>Improvements in power: the top signal from each candidate fine-mapping cluster is more likely to be the true causal signal when annotations are used.<ol>
+<li>Improvements in power: the top signal from each candidate fine-mapping cluster is more likely to be the true causal signal when annotations are used.<ul>
 <li><strong>power</strong>: measures how many times the simulated signals ("singals" hereafter) are captured by fine-mapping clusters ("clusters" hereafter).</li>
 <li><strong>false discovery porportion</strong>: measures how many clusters do not capture any signal.</li>
-</ol>
+</ul>
 </li>
-<li>Improvements in fine-mapping resolution: with the use of annotations we expect to provide smaller sets of candidate SNPs than without them.<ol>
+<li>Improvements in fine-mapping resolution: with the use of annotations we expect to provide smaller sets of candidate SNPs than without them.<ul>
 <li><strong>top hit rate</strong>: measures how many times the top association from each cluster is in fact a signal.</li>
 <li><strong>size</strong>: median size of clusters, smaller size means higher resolution.</li>
 <li><strong>purity</strong>: average $r^2$ within clusters, higher $r^2$ means higher resolution.</li>
-</ol>
+</ul>
 </li>
 </ol>
 
@@ -259,16 +259,82 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><h3 id="Genotype-data">Genotype data<a class="anchor-link" href="#Genotype-data">&#182;</a></h3><p>We use real data genotypes from GTEx project, of ~600 European individual samples. We create genomic regions (fine-mapping analysis units) each containing 1,000 SNPs. Using real genotype data we retain the realistic LD pattern between SNPs. We analyze ~1,050 units (simulation replicates).</p>
-<h3 id="Simulation-of-phenotypes">Simulation of phenotypes<a class="anchor-link" href="#Simulation-of-phenotypes">&#182;</a></h3><p>We assume each analysis unit contains 1, 2, 3 or 4 causal variants. The genomic position of causal variants are simulated to associate with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome. (analysis performed by Min Qiao)</p>
+<h2 id="Simulation-scheme">Simulation scheme<a class="anchor-link" href="#Simulation-scheme">&#182;</a></h2><p>The general idea is to simulate summary statistics enriched in genomic annotations -- because nowadays most studies work with summary statistics. We need these quantities:</p>
+<ol>
+<li>GWAS sample size, MAF and LD matrix, which can be estimated from real genotype data<ul>
+<li>We estimate it from GTEx project of ~600 European samples. We use sample size of 80,000 to reflect the scale of available SCZ data.</li>
+</ul>
+</li>
+<li>PVE and polygenicity information from literature for the phenotype of interest<ul>
+<li>For SCZ the total PVE is 0.8; for the 1 million variants typically analyzed the proportion of causal is 0.006</li>
+</ul>
+</li>
+<li>Enrichment of possibly causal variance in different genomic annotations of relevance<ul>
+<li>We evaluate 5 (or 7?) atac-seq based annotations, enrichment test performed by Min Qiao</li>
+</ul>
+</li>
+</ol>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Simulation-of-expected-z-scores">Simulation of expected z-scores<a class="anchor-link" href="#Simulation-of-expected-z-scores">&#182;</a></h3><p>We generate from standard univariate linear regression,</p>
+<p>\begin{align}
+y=X\beta + E, E \sim N(0, \sigma_a^2).
+\end{align}</p>
+<p>Percentage of variance explained, assuming additive polygenic effects:</p>
+<p>\begin{align}
+PVE &amp; = \frac{var(X\beta)}{var(y)} \\
+&amp; = \sum_{j\in C} \frac{var(X_j\beta_j)}{var(y)} \\
+&amp; = \sum_{j\in C} PVE_j,
+\end{align}</p>
+<p>where $C$ is the causal set whose effects are independent, and for SCZ</p>
+<p>\begin{align}
+PVE_j \approx \frac{0.8}{1~\text{million} \times 0.006} = 1.34\times 10^{-4}.
+\end{align}</p>
+<p>Assume $y$ is scaled to have unit variance. Then $PVE_j = var(X_j\beta_j)$. For causal SNP $j$,</p>
+<p>\begin{align}
+var(X_j\beta_j) &amp;= \beta_j^2var(X_j) \\
+&amp;= 2f_j(1-f_j)\beta_j^2
+\end{align}</p>
+<p>where $f_j$ is the causal allele frequency. The effect size is then</p>
+<p>\begin{align}
+\beta_j &amp;= -1^{\mathbb{1}[f_j&lt;0.5]}\sqrt{\frac{PVE_j}{2f_j(1-f_j)}}
+\end{align}</p>
+<p>that is, under conventional genotype coding of 0 for major and 1 for minor allele, the direction of effect size $\beta_j$ is positive if the causal allele is a minor allele.</p>
+<p>Estimate of effect size follows distribution $\hat{\beta}_j \sim N(\beta_j, \sigma_j^2)$, where the variance for BLUE of $\beta$,</p>
+<p>\begin{align}
+\sigma_j^2 &amp;= \frac{var(y)}{Nvar({X_j})} \\
+&amp;= \frac{1}{Nvar({X_j})} \\
+&amp;= \frac{1}{2Nf_j(1-f_j)}
+\end{align}</p>
+<p>The sample size $N$, for SCZ GWAS studies Hence the z-score summary statistic for causal SNP $j$ is</p>
+<p>\begin{align}
+z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
+&amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \sqrt{N \times PVE_j}
+\end{align}</p>
+<p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
+<h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In GWAS, observed z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(Z, R^2)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create ~2,000 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, ~2,000 simulations of different underlying LD structure. Each chunk should have muliple LD blocks. Under this setting the average number of causal SNPs within each region is 3 ($500 \times 0.006$). The exact positions these causal variants occur are associated with genomic annotations. From previous enrichment analysis of 5 annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. The 5 annotations physically cover a total of 13.36% of the genome.</p>
 <p>Let $p_1$ and $p_0$ denote causal probability of SNPs inside and outside annotation regions,</p>
 <p>\begin{align}
 \gamma &amp; = \frac{p_1/1-p_1}{p_0/1-p_0} \\
-L &amp; = [qp_1 + (1-q)p_0] \times N
+L &amp; = [qp_1 + (1-q)p_0] \times M
 \end{align}</p>
-<p>where $\gamma$ is the mean odds ratio ($\gamma = 4.74$), $L$ is the number of causal variants in the region ($L = 1,2,3,4$), $N$ is total length of the region ($N=1000$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
-<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit. To simulate phenotypes we assume for a causal variant an effect size $\beta_j \sim N(0, \sigma^2)$. We generate phenotype from a linear model $y=X\beta + E, E \sim N(0, \sigma_a^2)$. Relative strength of $\sigma^2$ and $\sigma_a$ are determined by percentage of variance explained (PVE) by all genetic effects. We set PVE to 0.1.</p>
-<h3 id="Caveats">Caveats<a class="anchor-link" href="#Caveats">&#182;</a></h3><p>Here we only have ~600 genotype samples to work with. Also we simulated quantitive phenotypes. GWAS of interest typically involves hundreds of thousands of samples with binary disease outcome. However we argue that in practice we work with summary statistics, ie, z-scores and LD matrices, whose distribution under the null are the same for quantitative and case-control phenotypes. Also, although generated from ~600 sample, the observed effect sizes $\hat{\beta}$ should have similar "LD convoluted" structure as they are from larger samples, the main motivation we use real data genotypes even though the sample size is not large compared to typical GWAS analysis. I'm just arguing that our settings here should be good enough.</p>
+<p>where $\gamma$ is the mean odds ratio (we try $\gamma = 3, 4.5, 6$), $L$ is the number of causal variants in the region ($L = 3$), $M$ is length of the region ($M=500$), $q$ is proportion of region overlapping with functional annotations ($q=0.1336$).</p>
+<p>For simplicity we create for each analysis unit 5 non-overlapping consective regions with total length constituting 13.36% of the length of the unit.</p>
 
 </div>
 </div>
@@ -308,8 +374,8 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">zzz</span><span class="o">.</span><span class="n">dsc</span>
-<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_prior</span>
-<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_y</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_region</span>
+<span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_z</span>
 <span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span>
 <span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span>
 </pre></div>
@@ -358,7 +424,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <span class="kn">DSC:</span>
     <span class="n">define</span><span class="p">:</span>
         <span class="n">fit</span><span class="p">:</span> <span class="n">dap</span><span class="p">,</span> <span class="n">dapa</span>
-    <span class="n">run</span><span class="p">:</span> <span class="n">simulate_prior</span> <span class="o">*</span> <span class="n">simulate_y</span> <span class="o">*</span> <span class="n">fit</span> <span class="o">*</span> <span class="n">evaluate</span>
+    <span class="n">run</span><span class="p">:</span> <span class="n">simulate_region</span> <span class="o">*</span> <span class="n">simulate_z</span> <span class="o">*</span> <span class="n">fit</span> <span class="o">*</span> <span class="n">evaluate</span>
     <span class="n">exec_path</span><span class="p">:</span> <span class="n">modules</span>
     <span class="k">global</span><span class="p">:</span>
         <span class="n">data_file</span><span class="p">:</span> <span class="n">gtex</span><span class="o">-</span><span class="n">manifest</span><span class="o">.</span><span class="n">txt</span>
@@ -394,7 +460,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="simulate_prior.dsc"><code>simulate_prior.dsc</code><a class="anchor-link" href="#simulate_prior.dsc">&#182;</a></h3>
+<h3 id="simulate_region.dsc"><code>simulate_region.dsc</code><a class="anchor-link" href="#simulate_region.dsc">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -403,19 +469,24 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_prior</span><span class="o">.</span><span class="n">dsc</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_region</span><span class="o">.</span><span class="n">dsc</span>
 
-<span class="kn">simulate_prior:</span> <span class="n">sim_prior</span><span class="o">.</span><span class="n">R</span> <span class="o">+</span> <span class="n">R</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="n">dataset</span><span class="p">);</span>
-                           <span class="n">X</span> <span class="o">=</span> <span class="n">get_loci</span><span class="p">(</span><span class="n">data</span><span class="err">$</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">);</span>
-                           <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">))</span>
+<span class="kn">simulate_region:</span> <span class="n">sim_region</span><span class="o">.</span><span class="n">R</span> <span class="o">+</span> <span class="n">R</span><span class="p">(</span><span class="n">data</span> <span class="o">=</span> <span class="n">readRDS</span><span class="p">(</span><span class="n">dataset</span><span class="p">);</span>
+                                  <span class="n">X</span> <span class="o">=</span> <span class="n">get_loci</span><span class="p">(</span><span class="n">data</span><span class="err">$</span><span class="n">X</span><span class="p">,</span> <span class="n">M</span><span class="p">);</span>
+                                  <span class="n">R</span> <span class="o">=</span> <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">cor</span><span class="p">(</span><span class="n">X</span><span class="p">[[</span><span class="n">i</span><span class="p">]]));</span>
+                                  <span class="n">eff_sign</span> <span class="o">=</span> <span class="n">get_sign</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+                                  <span class="n">prior</span> <span class="o">=</span> <span class="n">get_prior</span><span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">chunks</span><span class="p">,</span> <span class="n">g</span><span class="p">,</span> <span class="n">q</span><span class="p">);</span>
+                                  <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">R</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span><span class="n">paste0</span><span class="p">(</span><span class="n">ld_file</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">),</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)))</span>                           
   <span class="n">dataset</span><span class="p">:</span> <span class="n">Shell</span><span class="p">{</span><span class="n">head</span> <span class="o">-</span><span class="err">$</span><span class="p">{</span><span class="n">n_units</span><span class="p">}</span> <span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">}}</span>
-  <span class="n">N</span><span class="p">:</span> <span class="mi">1000</span>
+  <span class="n">M</span><span class="p">:</span> <span class="mi">500</span>
   <span class="n">chunks</span><span class="p">:</span> <span class="mi">5</span>
-  <span class="n">g</span><span class="p">:</span> <span class="mf">4.74</span>
+  <span class="n">g</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="mf">4.5</span><span class="p">,</span> <span class="mi">6</span>
   <span class="n">q</span><span class="p">:</span> <span class="mf">0.1336</span>
-  <span class="err">$</span><span class="n">X</span><span class="p">:</span> <span class="n">X</span>
+  <span class="err">$</span><span class="n">eff_sign</span><span class="p">:</span> <span class="n">eff_sign</span>
+  <span class="err">$</span><span class="n">R</span><span class="p">:</span> <span class="n">R</span>
   <span class="err">$</span><span class="n">prior</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">prior</span>
   <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
+  <span class="err">$</span><span class="n">ld_file</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">ld</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -433,7 +504,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/simulate_prior.dsc" target="_blank">modules/simulate_prior.dsc</a></div>
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_region.dsc" target="_blank">modules/simulate_region.dsc</a></div>
 </div>
 
 </div>
@@ -446,26 +517,26 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="simulate_y.dsc"><code>simulate_y.dsc</code><a class="anchor-link" href="#simulate_y.dsc">&#182;</a></h3>
+<h3 id="simulate_z.dsc"><code>simulate_z.dsc</code><a class="anchor-link" href="#simulate_z.dsc">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_y</span><span class="o">.</span><span class="n">dsc</span>
-<span class="kn">simulate_y:</span> <span class="n">sim_y</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">coef</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">residual_var</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">))</span>
-  <span class="n">X</span><span class="p">:</span> <span class="err">$</span><span class="n">X</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">simulate_z</span><span class="o">.</span><span class="n">dsc</span>
+<span class="kn">simulate_z:</span> <span class="n">sim_z</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">z_true</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">simulate</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">))</span>
+  <span class="n">R</span><span class="p">:</span> <span class="err">$</span><span class="n">R</span>
+  <span class="n">eff_sign</span><span class="p">:</span> <span class="err">$</span><span class="n">eff_sign</span>
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
-  <span class="n">n_signal</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span>
-  <span class="n">pve</span><span class="p">:</span> <span class="mf">0.1</span>
-  <span class="n">amplitude</span><span class="p">:</span> <span class="mf">0.6</span>
-  <span class="err">$</span><span class="n">y</span><span class="p">:</span> <span class="n">y</span>
-  <span class="err">$</span><span class="n">coef</span><span class="p">:</span> <span class="n">coef</span>
+  <span class="n">N</span><span class="p">:</span> <span class="mi">80000</span>
+  <span class="n">n_signal</span><span class="p">:</span> <span class="mi">3</span>
+  <span class="n">pve</span><span class="p">:</span> <span class="mf">1.34E-4</span>
+  <span class="err">$</span><span class="n">z</span><span class="p">:</span> <span class="n">z</span>
+  <span class="err">$</span><span class="n">z_true</span><span class="p">:</span> <span class="n">z_true</span>
   <span class="err">$</span><span class="n">L</span><span class="p">:</span> <span class="n">L</span>
-  <span class="err">$</span><span class="n">residual_var</span><span class="p">:</span> <span class="n">residual_var</span>
 </pre></div>
 
 </div>
@@ -483,7 +554,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/simulate_y.dsc" target="_blank">modules/simulate_y.dsc</a></div>
+<div class="sos_hint">Cell content saved to <a href="modules/simulate_z.dsc" target="_blank">modules/simulate_z.dsc</a></div>
 </div>
 
 </div>
@@ -507,14 +578,14 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">fit</span><span class="o">.</span><span class="n">dsc</span>
 
-<span class="kn">dap:</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
-  <span class="n">X</span><span class="p">:</span> <span class="err">$</span><span class="n">X</span>
-  <span class="n">y</span><span class="p">:</span> <span class="err">$</span><span class="n">y</span>
+<span class="kn">dap:</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+  <span class="n">ld</span><span class="p">:</span> <span class="err">$</span><span class="n">ld_file</span>
+  <span class="n">z</span><span class="p">:</span> <span class="err">$</span><span class="n">z</span>
   <span class="n">args</span><span class="p">:</span> <span class="s2">&quot;-ld_control 0.20 --all&quot;</span>
   <span class="n">cache</span><span class="p">:</span> <span class="nb">file</span><span class="p">(</span><span class="n">DAP</span><span class="p">)</span>
   <span class="err">$</span><span class="n">posterior</span><span class="p">:</span> <span class="n">posterior</span>
 
-<span class="n">dapa</span><span class="p">(</span><span class="n">dap</span><span class="p">):</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+<span class="n">dapa</span><span class="p">(</span><span class="n">dap</span><span class="p">):</span> <span class="n">fit_dap</span><span class="o">.</span><span class="n">py</span> <span class="o">+</span> <span class="n">Python</span><span class="p">(</span><span class="n">posterior</span> <span class="o">=</span> <span class="n">dap_batch_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
 </pre></div>
 
@@ -558,7 +629,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span><span class="o">.</span><span class="n">dsc</span>
 
 <span class="kn">evaluate:</span> <span class="n">evaluate_dap</span><span class="o">.</span><span class="n">py</span>
-  <span class="n">coef</span><span class="p">:</span> <span class="err">$</span><span class="n">coef</span>
+  <span class="n">z_true</span><span class="p">:</span> <span class="err">$</span><span class="n">z_true</span>
   <span class="n">posterior</span><span class="p">:</span> <span class="err">$</span><span class="n">posterior</span>
   <span class="err">$</span><span class="n">is_recovered</span><span class="p">:</span> <span class="n">is_recovered</span>
   <span class="err">$</span><span class="n">is_cs_true</span><span class="p">:</span> <span class="n">is_cs_true</span>
@@ -595,7 +666,7 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation">Simulation<a class="anchor-link" href="#Simulation">&#182;</a></h2>
+<h2 id="Code-for-Simulation">Code for Simulation<a class="anchor-link" href="#Code-for-Simulation">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -603,10 +674,10 @@ L &amp; = [qp_1 + (1-q)p_0] \times N
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="sim_prior.R"><code>sim_prior.R</code><a class="anchor-link" href="#sim_prior.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_1$. From equations above, assuming $L=1$ we derive:</p>
+<h3 id="sim_region.R"><code>sim_region.R</code><a class="anchor-link" href="#sim_region.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_1$. From equations above, assuming $L=1$ we derive:</p>
 <p>\begin{align}
 p_1 = \frac{\gamma p_0}{1 - p_0 + \gamma p_0} \\
-N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
+M(q-1-\gamma q + \gamma)p_0^2 - (Mq - M - Mq\gamma + \gamma - 1)p_0 - 1= 0
 \end{align}</p>
 <p>We can solve this numerically in R, eg:</p>
 
@@ -618,8 +689,8 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.74</span>
-<span class="n">N</span> <span class="o">=</span> <span class="mi">1000</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="n">g</span> <span class="o">=</span> <span class="mf">4.5</span>
+<span class="n">N</span> <span class="o">=</span> <span class="mi">500</span>
 <span class="n">q</span> <span class="o">=</span> <span class="mf">0.1336</span>
 <span class="n">foo</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="n">N</span> <span class="o">*</span> <span class="p">(</span><span class="n">q</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">g</span><span class="o">*</span><span class="n">q</span><span class="o">+</span><span class="n">g</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span><span class="o">^</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">N</span><span class="o">-</span><span class="n">N</span><span class="o">*</span><span class="n">q</span><span class="o">*</span><span class="n">g</span><span class="o">+</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span>
 <span class="n">p0</span> <span class="o">=</span> <span class="n">uniroot</span><span class="p">(</span><span class="n">foo</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">tol</span> <span class="o">=</span> <span class="o">.</span><span class="n">Machine</span><span class="err">$</span><span class="n">double</span><span class="o">.</span><span class="n">eps</span><span class="o">^</span><span class="mf">0.8</span><span class="p">)</span><span class="err">$</span><span class="n">root</span>
@@ -641,7 +712,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 0.000667518 0.003156156
+<pre>[1] 0.001365430 0.006115208
 </pre>
 </div>
 </div>
@@ -674,7 +745,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[1] 4.74
+<pre>[1] 4.5
 [1] 1
 </pre>
 </div>
@@ -688,7 +759,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We should be good. I'll use this in my simulation code below.</p>
+<p>These probabilities recover the odds ratio, so we should be good. I'll use this in my simulation code below.</p>
 
 </div>
 </div>
@@ -698,7 +769,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_prior</span><span class="o">.</span><span class="n">R</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_region</span><span class="o">.</span><span class="n">R</span>
 <span class="n">get_loci</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span> <span class="p">{</span>
     <span class="n">segs</span> <span class="o">=</span> <span class="n">floor</span><span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span><span class="p">)</span>
     <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">segs</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="n">X</span><span class="p">[,</span><span class="n">i</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)])</span>
@@ -714,6 +785,9 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
     <span class="n">prior</span><span class="p">[</span><span class="n">annotated</span><span class="p">]</span> <span class="o">=</span> <span class="n">p1</span>                          
     <span class="nb">list</span><span class="p">(</span><span class="n">prior</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">annotation</span><span class="o">=</span><span class="n">annotated</span><span class="p">)</span>                          
 <span class="p">}</span>
+<span class="n">get_sign</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">lapply</span><span class="p">(</span><span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="nb">apply</span><span class="p">(</span><span class="n">X</span><span class="p">[[</span><span class="n">i</span><span class="p">]],</span> <span class="mi">2</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="k">as</span><span class="o">.</span><span class="n">integer</span><span class="p">((</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)))</span>
+<span class="p">}</span>
 </pre></div>
 
 </div>
@@ -731,7 +805,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/sim_prior.R" target="_blank">modules/sim_prior.R</a></div>
+<div class="sos_hint">Cell content saved to <a href="modules/sim_region.R" target="_blank">modules/sim_region.R</a></div>
 </div>
 
 </div>
@@ -744,7 +818,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="sim_y.py"><code>sim_y.py</code><a class="anchor-link" href="#sim_y.py">&#182;</a></h3>
+<h3 id="sim_z.py"><code>sim_z.py</code><a class="anchor-link" href="#sim_z.py">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -753,103 +827,28 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_y</span><span class="o">.</span><span class="n">py</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">save</span> <span class="o">-</span><span class="n">f</span> <span class="n">modules</span><span class="o">/</span><span class="n">sim_z</span><span class="o">.</span><span class="n">py</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">pprint</span> <span class="kn">import</span> <span class="n">pformat</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">time</span>
 
-<span class="k">class</span> <span class="nc">RegressionData</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
-        <span class="c1"># FIXME: check if inputs are indeed numpy arrays</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">=</span> <span class="n">X</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">=</span> <span class="n">Z</span>
-        <span class="k">if</span> <span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">))))</span>
+<span class="k">def</span> <span class="nf">sim_gwas_z</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
+    <span class="c1"># get expected z-score assuming all causal</span>
+    <span class="n">z_true</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">N</span> <span class="o">*</span> <span class="n">pve</span><span class="p">)</span> <span class="o">*</span> <span class="n">eff_sign</span>
+    <span class="c1"># sparsify expected z-score to allow for n_signal causal</span>
+    <span class="c1"># FIXME: might overlap if some prior is very high; </span>
+    <span class="c1"># thus not gauranteed to have exactly n_signal non-zeros</span>
+    <span class="c1"># but it is quite convenient to call this function</span>
+    <span class="n">z_true</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+    <span class="c1"># get observed z-scores</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">z_true</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_true</span>
 
-    <span class="k">def</span> <span class="nf">center_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># for np.array: np.mean(Z, axis=0, keepdims=True)</span>
-        <span class="c1"># for np.matrix, no keepdims argument</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">x_mean</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Y</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Y</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_mean</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Z</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">z_mean</span>
-
-    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">pformat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span> <span class="n">indent</span> <span class="o">=</span> <span class="mi">4</span><span class="p">)</span>
-
-<span class="k">class</span> <span class="nc">UnivariateSimulator</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dim</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">dim</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pi0</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pis</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mus</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span> <span class="o">=</span> <span class="bp">None</span>
-        
-    <span class="k">def</span> <span class="nf">set_vanilla</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pis</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mus</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">amplitude</span><span class="p">]</span>
-        
-    <span class="k">def</span> <span class="nf">get_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        beta ~ \pi_0\delta_0 + \sum \pi_i N(mu_i, sigma_i)</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-        <span class="n">sigmas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sigmas</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">))</span> <span class="o">==</span> <span class="n">sigmas</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">masks</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pis</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="n">mix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mus</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mix</span> <span class="o">*</span> <span class="n">masks</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">binomial</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">pi0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">sparsify_effects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_non_zero</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
-        <span class="c1"># FIXME: might overlap if some prior is very high; thus not gauranteed to have num_non_zero non-zeros</span>
-        <span class="n">ones</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">num_non_zero</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span> <span class="o">*</span> <span class="n">ones</span>
-                
-    <span class="k">def</span> <span class="nf">get_y</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">regression_data</span><span class="p">,</span> <span class="n">pve</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">sigma</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">pve</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Need one of sigma or pve.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">pve</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">pve</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;PVE has to be between 0 and 1, not {pve}.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">pve</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="n">genetic_var</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
-            <span class="n">pheno_var</span> <span class="o">=</span> <span class="n">genetic_var</span> <span class="o">/</span> <span class="n">pve</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span> <span class="o">=</span> <span class="n">pheno_var</span> <span class="o">-</span> <span class="n">genetic_var</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">coef</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">),</span> <span class="n">regression_data</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="c1"># y.reshape(len(y), 1)</span>
-        <span class="k">return</span> <span class="n">y</span><span class="o">.</span><span class="n">T</span>
-    
-<span class="k">def</span> <span class="nf">simple_lm</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">c</span><span class="p">):</span>
-    <span class="n">reg</span> <span class="o">=</span> <span class="n">RegressionData</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
-    <span class="n">reg</span><span class="o">.</span><span class="n">center_data</span><span class="p">()</span>
-    <span class="n">eff</span> <span class="o">=</span> <span class="n">UnivariateSimulator</span><span class="p">(</span><span class="n">reg</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="n">eff</span><span class="o">.</span><span class="n">set_vanilla</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;amplitude&#39;</span><span class="p">])</span>
-    <span class="n">eff</span><span class="o">.</span><span class="n">get_effects</span><span class="p">()</span>
-    <span class="n">eff</span><span class="o">.</span><span class="n">sparsify_effects</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;n_signal&#39;</span><span class="p">],</span> <span class="n">prior</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">eff</span><span class="o">.</span><span class="n">get_y</span><span class="p">(</span><span class="n">reg</span><span class="p">,</span> <span class="n">pve</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;pve&#39;</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">eff</span><span class="o">.</span><span class="n">coef</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">eff</span><span class="o">.</span><span class="n">residual_variance</span><span class="p">,</span> <span class="n">y</span>
-
-<span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">):</span>
-    <span class="n">coef</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">}</span>
-    <span class="n">residual_var</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">}</span>
-    <span class="n">c</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;n_signal&#39;</span><span class="p">:</span> <span class="n">n_signal</span><span class="p">,</span> <span class="s1">&#39;pve&#39;</span><span class="p">:</span> <span class="n">pve</span><span class="p">,</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">:</span> <span class="n">amplitude</span><span class="p">}</span>
-    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">:</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">simple_lm</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">prior</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
-        <span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">residual_var</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">y</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">coef</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">residual_var</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">coef</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">coef</span><span class="p">}</span>
+<span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
+    <span class="n">z_true</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">R</span><span class="p">}</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">R</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">R</span><span class="p">:</span>
+        <span class="n">z</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">z_true</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">sim_gwas_z</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_true</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">z_true</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">z_true</span><span class="p">}</span>
 </pre></div>
 
 </div>
@@ -867,7 +866,7 @@ N(q-1-\gamma q + \gamma)p_0^2 - (Nq - N - Nq\gamma + \gamma - 1)p_0 - 1= 0
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">Cell content saved to <a href="modules/sim_y.py" target="_blank">modules/sim_y.py</a></div>
+<div class="sos_hint">Cell content saved to <a href="modules/sim_z.py" target="_blank">modules/sim_z.py</a></div>
 </div>
 
 </div>
@@ -933,32 +932,22 @@ Independent association signal clusters
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
-<span class="k">def</span> <span class="nf">write_dap_full</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prefix</span><span class="p">,</span><span class="n">r</span><span class="p">):</span>
-    <span class="n">names</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="s1">&#39;geno&#39;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;group_{r}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])])</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.data&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="o">*</span><span class="p">([</span><span class="s1">&#39;pheno&#39;</span><span class="p">,</span> <span class="s1">&#39;pheno&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;group_{r}&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">())),</span> <span class="nb">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">names</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)),</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
-<span class="c1">#     grid = &#39;&#39;&#39;         </span>
-<span class="c1">#         0.0000  0.1000</span>
-<span class="c1">#         0.0000  0.2000</span>
-<span class="c1">#         0.0000  0.4000</span>
-<span class="c1">#         0.0000  0.8000</span>
-<span class="c1">#         0.0000  1.6000</span>
-<span class="c1">#         &#39;&#39;&#39;</span>
-<span class="c1">#     grid = &#39;\n&#39;.join([x.strip() for x in grid.strip().split(&#39;\n&#39;)])</span>
-<span class="c1">#     with open(f&#39;{prefix}.grid&#39;, &#39;w&#39;) as f:</span>
-<span class="c1">#         print(grid, file=f)</span>
+<span class="k">def</span> <span class="nf">write_dap_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;z-score vesion of dap input is the same as FINEMAP&#39;&#39;&#39;</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.z&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">f</span><span class="p">,</span>  <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">ids</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">delimiter</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
 
 <span class="k">def</span> <span class="nf">write_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;{i+1}</span><span class="se">\t</span><span class="s1">{p}&#39;</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">prior</span><span class="p">)]))</span>
 
-<span class="k">def</span> <span class="nf">run_dap_full</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dap-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.data&#39;</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">,</span> <span class="s1">&#39;--output_all&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dap-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-d_z&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.z&#39;</span><span class="p">,</span> <span class="s1">&#39;-d_ld&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{ld}.{r}&#39;</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">,</span> <span class="s1">&#39;--output_all&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.prior&#39;</span><span class="p">])</span>
     <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>    
-
+    
 <span class="k">def</span> <span class="nf">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
     <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
     <span class="n">pips</span> <span class="o">=</span> <span class="p">[]</span>
@@ -981,16 +970,16 @@ Independent association signal clusters
     <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">pips</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;cluster&#39;</span><span class="p">])[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">on</span> <span class="o">=</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;snp&#39;</span><span class="p">:</span> <span class="n">pips</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span> <span class="n">clusters</span><span class="p">}</span>
 
-<span class="k">def</span> <span class="nf">dap_single</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-    <span class="n">write_dap_full</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">prefix</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">dap_single_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">write_dap_z</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">prefix</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">prior</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">write_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
-    <span class="n">run_dap_full</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+    <span class="n">run_dap_z</span><span class="p">(</span><span class="n">ld</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">dap_batch</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">Y</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">dap_batch_z</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">ld</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single_z</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">ld</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Z</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -1087,7 +1076,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/dd6cea63bad78adbc0c0f3023c1a645f76376b55/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 00:06:05 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/dd6cea63bad78adbc0c0f3023c1a645f76376b55">revision 5, dd6cea6</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/64de66216b27b449bfb74d0c3e2386c82f1e5b9b/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Aug 19 19:27:19 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/64de66216b27b449bfb74d0c3e2386c82f1e5b9b">revision 6, 64de662</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
