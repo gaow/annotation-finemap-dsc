@@ -12,10 +12,12 @@ def write_prior(prior, prefix):
     with open(f'{prefix}.prior', 'w') as f:
         f.write('\n'.join([f'{i+1}\t{p}' for i, p in enumerate(prior)]))
 
-def run_dap_z(ld, r, prior, prefix, args):
+def run_dap_z(ld, r, L, prior, prefix, args):
     cmd = ['dap-g', '-d_z', f'{prefix}.z', '-d_ld', f'{ld}.{r}', '-o', f'{prefix}.result', '--output_all'] + ' '.join(args).split()
     if prior is not None:
         cmd.extend(['-p', f'{prefix}.prior'])
+    if L > 0:
+        cmd.extend(['-msize', str(L)])
     subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()    
     
 def extract_dap_output(prefix):
@@ -40,13 +42,13 @@ def extract_dap_output(prefix):
     clusters = pd.merge(clusters, pips.groupby(['cluster'])['snp'].apply(','.join).reset_index(), on = 'cluster')
     return {'snp': pips, 'set': clusters}
 
-def dap_single_z(z, ld, prefix, r, prior, args):
+def dap_single_z(z, ld, L, prefix, r, prior, args):
     write_dap_z(z,prefix)
     if prior is not None:
         write_prior(prior, prefix)
-    run_dap_z(ld, r, prior, prefix, args)
+    run_dap_z(ld, r, L, prior, prefix, args)
     return extract_dap_output(prefix)
 
 
-def dap_batch_z(Z, ld, prefix, prior, *args):
-    return dict([(k, dap_single_z(Z[k], ld, f'{prefix}_condition_{k}', k, prior, args)) for k in Z])
+def dap_batch_z(Z, ld, L, prefix, prior, *args):
+    return dict([(k, dap_single_z(Z[k], ld, L[k], f'{prefix}_condition_{k}', k, prior, args)) for k in Z])
