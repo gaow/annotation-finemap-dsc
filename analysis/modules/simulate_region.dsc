@@ -14,6 +14,6 @@ simulate_prior: sim_region.R + R(prior = get_prior(nrow(read.table(paste0(ld_fil
   ld_file: $ld_file
   # enrichment parameters:
   # should be (gamma, p) where gamma is a vector of odds ratios, p is the corresponding vector of proportions of annotated regions
-  eparam: ((3, 55), (0.1269, 0.00668)), ((5, 55), (0.1269, 0.00668)), ((7, 55), (0.1269, 0.00668)), (3, 0.1336), (5, 0.1336), (7, 0.1336)
+  eparam: (3, 0.1336), ((3, 55), (0.1269, 0.00668))
   $prior: prior$prior
   $annotation: prior$annotation

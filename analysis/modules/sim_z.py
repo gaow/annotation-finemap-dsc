@@ -13,7 +13,8 @@ def sim_gwas_z(R, N, pve, eff_sign, n_signal, prior):
     z_true *= np.random.multinomial(n_signal, prior)
     # get observed z-scores
     # FIXME: there is a PSD warning I cannot get rid of for now
-    z = np.random.multivariate_normal(np.ravel(R @ z_true), R)
+    # simply ignore it ...
+    z = np.random.multivariate_normal(np.ravel(R @ z_true), R, check_valid = 'ignore')
     return z, z_true
 
 def simulate(R, N, pve, eff_sign, n_signal, prior):
