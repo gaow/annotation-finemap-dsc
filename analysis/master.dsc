@@ -14,5 +14,4 @@ DSC:
     global:
         data_file: gtex-manifest.txt
         n_units: 150
-        unit_length: 500
     output: xh_grant

@@ -1,3 +1,13 @@
+CorrectCM <- function(CM)
+  {
+  n <- dim(var(CM))[1L]
+  E <- eigen(CM)
+  CM1 <- E$vectors %*% tcrossprod(diag(pmax(E$values, 0), n), E$vectors)
+  Balance <- diag(1/sqrt(diag(CM1)))
+  CM2 <- Balance %*% CM1 %*% Balance  
+  return(CM2)
+}
+
 get_loci = function(X, N) {
     segs = floor(ncol(X) / N)
     lapply(1:segs, function(i) X[,i:(i+N-1)])
