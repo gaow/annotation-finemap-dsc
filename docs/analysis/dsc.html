@@ -877,7 +877,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 
 <span class="k">def</span> <span class="nf">sim_gwas_z</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R</span><span class="p">))))</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]))))</span>
     <span class="c1"># get expected z-score assuming all causal</span>
     <span class="c1"># it really does not matter to our purpose whether Z is positive or negative</span>
     <span class="c1"># because it is only a matter of allele coding ...</span>
@@ -1128,7 +1128,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/c3c4b2d842d0f8e65b4d961795099dd276590b18/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 11:40:57 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/c3c4b2d842d0f8e65b4d961795099dd276590b18">revision 24, c3c4b2d</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/f69b099c31085165b637ba564021750d2aa3cbe5/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 11:42:52 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/f69b099c31085165b637ba564021750d2aa3cbe5">revision 25, f69b099</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
