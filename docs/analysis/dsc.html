@@ -516,7 +516,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="n">ld_file</span><span class="p">:</span> <span class="err">$</span><span class="n">ld_file</span>
   <span class="c1"># enrichment parameters:</span>
   <span class="c1"># should be (gamma, p) where gamma is a vector of odds ratios, p is the corresponding vector of proportions of annotated regions</span>
-  <span class="n">eparam</span><span class="p">:</span> <span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.00668</span><span class="p">)),</span> <span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.00668</span><span class="p">)),</span> <span class="p">((</span><span class="mi">7</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.00668</span><span class="p">)),</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.1336</span><span class="p">),</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mf">0.1336</span><span class="p">),</span> <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mf">0.1336</span><span class="p">)</span>
+  <span class="n">eparam</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">0.1336</span><span class="p">),</span> <span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">55</span><span class="p">),</span> <span class="p">(</span><span class="mf">0.1269</span><span class="p">,</span> <span class="mf">0.00668</span><span class="p">))</span>
   <span class="err">$</span><span class="n">prior</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">prior</span>
   <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
 </pre></div>
@@ -563,7 +563,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="n">R</span><span class="p">:</span> <span class="err">$</span><span class="n">R</span>
   <span class="n">eff_sign</span><span class="p">:</span> <span class="err">$</span><span class="n">eff_sign</span>
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
-  <span class="n">N</span><span class="p">:</span> <span class="mi">80000</span>
+  <span class="n">N</span><span class="p">:</span> <span class="mi">50000</span><span class="p">,</span> <span class="mi">80000</span><span class="p">,</span> <span class="mi">150000</span>
   <span class="n">n_signal</span><span class="p">:</span> <span class="mi">1</span>
   <span class="n">pve</span><span class="p">:</span> <span class="mf">1.34E-4</span>
   <span class="err">$</span><span class="n">z</span><span class="p">:</span> <span class="n">z</span>
@@ -889,7 +889,8 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
     <span class="n">z_true</span> <span class="o">*=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">)</span>
     <span class="c1"># get observed z-scores</span>
     <span class="c1"># FIXME: there is a PSD warning I cannot get rid of for now</span>
-    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">R</span> <span class="err">@</span> <span class="n">z_true</span><span class="p">),</span> <span class="n">R</span><span class="p">)</span>
+    <span class="c1"># simply ignore it ...</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">R</span> <span class="err">@</span> <span class="n">z_true</span><span class="p">),</span> <span class="n">R</span><span class="p">,</span> <span class="n">check_valid</span> <span class="o">=</span> <span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_true</span>
 
 <span class="k">def</span> <span class="nf">simulate</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">pve</span><span class="p">,</span> <span class="n">eff_sign</span><span class="p">,</span> <span class="n">n_signal</span><span class="p">,</span> <span class="n">prior</span><span class="p">):</span>
@@ -1127,7 +1128,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/5aedf71c6f01d0a129e4aab7c671c2d6fd059d05/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 11:26:00 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/5aedf71c6f01d0a129e4aab7c671c2d6fd059d05">revision 23, 5aedf71</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/c3c4b2d842d0f8e65b4d961795099dd276590b18/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 11:40:57 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/c3c4b2d842d0f8e65b4d961795099dd276590b18">revision 24, c3c4b2d</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

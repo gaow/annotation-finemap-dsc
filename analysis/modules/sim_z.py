@@ -1,7 +1,7 @@
 import numpy as np
 
 def sim_gwas_z(R, N, pve, eff_sign, n_signal, prior):
-    np.random.seed(int(np.sum(np.array(R))))
+    np.random.seed(int(np.sum(np.array(R[:,1]))))
     # get expected z-score assuming all causal
     # it really does not matter to our purpose whether Z is positive or negative
     # because it is only a matter of allele coding ...
