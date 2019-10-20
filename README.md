@@ -1,4 +1,4 @@
-This notebook is written in [SoS notebook](https://vatlab.github.io/sos-docs/notebook.html#content) and can be compiled to a website as you see here, using [`jnbinder`](git@github.com:vatlab/jnbinder.git) script.
+This notebook is written in [SoS notebook](https://vatlab.github.io/sos-docs/notebook.html#content) and can be compiled to a website as you see here, using [`jnbinder`](https://github.com:vatlab/jnbinder) script.
 
 To compile, simply type 
 
