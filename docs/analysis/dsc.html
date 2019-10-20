@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="ipynb_website:version" content="0.9.5" />
+<meta name="ipynb_website:version" content="0.9.7" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <link rel="stylesheet" type="text/css" href="../css/jt.css">
@@ -226,16 +225,14 @@ body {
   </div><!--/.container -->
 </div><!--/.navbar -->
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Annotation-enhanced-genetic-fine-mapping">Annotation enhanced genetic fine-mapping<a class="anchor-link" href="#Annotation-enhanced-genetic-fine-mapping">&#182;</a></h1><h2 id="Aim">Aim<a class="anchor-link" href="#Aim">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>This simulation study compares fine-mapping with use of annotations / without it, in terms of:</p>
 <ol>
@@ -256,8 +253,7 @@ body {
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Simulation-overview">Simulation overview<a class="anchor-link" href="#Simulation-overview">&#182;</a></h2><p>We simulate fine-mapping analysis units of 500 variants, with LD structure estimated from European genotypes of GTEx project (version 8 release).
 Each unit contains &gt;2 LD blocks for this data-set. We generate expected GWAS z-scores under a polygenic model for SCZ, that is, a total of PVE 0.8 contributed by ~6,000 variants.
@@ -273,8 +269,7 @@ that ignores annotations. Specifically we look at the "top hit rate", defined as
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Simulation-details">Simulation details<a class="anchor-link" href="#Simulation-details">&#182;</a></h2><p>The general idea is to simulate summary statistics enriched in genomic annotations -- because nowadays most studies work with summary statistics. We need these quantities:</p>
 <ol>
@@ -296,67 +291,57 @@ that ignores annotations. Specifically we look at the "top hit rate", defined as
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Simulation-of-expected-z-scores">Simulation of expected z-scores<a class="anchor-link" href="#Simulation-of-expected-z-scores">&#182;</a></h3><p>We generate from standard univariate linear regression,</p>
-<p>\begin{align}
+\begin{align}
 y=X\beta + E, E \sim N(0, \sigma_a^2),
-\end{align}</p>
-<p>where both $X$ and $y$ are centered thus absence of the intercept term. Percentage of variance explained, assuming additive polygenic effects:</p>
-<p>\begin{align}
+\end{align}<p>where both $X$ and $y$ are centered thus absence of the intercept term. Percentage of variance explained, assuming additive polygenic effects:</p>
+\begin{align}
 PVE &amp; = \frac{var(X\beta)}{var(y)} \\
 &amp; = \sum_{j\in C} \frac{var(X_j\beta_j)}{var(y)} \\
 &amp; = \sum_{j\in C} PVE_j,
-\end{align}</p>
+\end{align}<p></p>
 <p>where $C$ is the causal set whose effects are independent, and for SCZ</p>
-<p>\begin{align}
+\begin{align}
 PVE_j \approx \frac{0.8}{1~\text{million} \times 0.006} = 1.34\times 10^{-4}.
-\end{align}</p>
-<p>Assume $y$ is scaled to have unit variance. Then $PVE_j = var(X_j\beta_j)$. For causal SNP $j$,</p>
-<p>\begin{align}
+\end{align}<p>Assume $y$ is scaled to have unit variance. Then $PVE_j = var(X_j\beta_j)$. For causal SNP $j$,</p>
+\begin{align}
 var(X_j\beta_j) &amp;= \beta_j^2var(X_j) \\
 &amp;= 2f_j(1-f_j)\beta_j^2
-\end{align}</p>
+\end{align}<p></p>
 <p>where $f_j$ is the causal allele frequency. The effect size is then</p>
-<p>\begin{align}
+\begin{align}
 \beta_j &amp;= -1^{\mathbb{1}[f_j&lt;0.5]}\sqrt{\frac{PVE_j}{2f_j(1-f_j)}}
-\end{align}</p>
-<p>that is, under conventional genotype coding of 0 for major and 1 for minor allele, the direction of effect size $\beta_j$ is positive if the causal allele is a minor allele.</p>
+\end{align}<p>that is, under conventional genotype coding of 0 for major and 1 for minor allele, the direction of effect size $\beta_j$ is positive if the causal allele is a minor allele.</p>
 <p>If columns of $X$ are independent, estimate of effect size follows distribution $\hat{\beta}_j \sim N(\beta_j, \sigma_j^2)$, where the variance for BLUE of $\beta$,</p>
-<p>\begin{align}
+\begin{align}
 \sigma_j^2 &amp;= \frac{var(y)}{Nvar({X_j})} \\
 &amp;= \frac{1}{Nvar({X_j})} \\
 &amp;= \frac{1}{2Nf_j(1-f_j)}
-\end{align}</p>
-<p>The sample size $N$, for SCZ GWAS study here is 80K. Hence the z-score summary statistic for causal SNP $j$ is set to</p>
-<p>\begin{align}
+\end{align}<p>The sample size $N$, for SCZ GWAS study here is 80K. Hence the z-score summary statistic for causal SNP $j$ is set to</p>
+\begin{align}
 z_j &amp;= \frac{\hat{\beta}_j}{\sigma_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \sqrt{N \times PVE_j} \\
 &amp;= -1^{\mathbb{1}[f_j&lt;0.5]} \times 3.27
-\end{align}</p>
-<p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
+\end{align}<p>z-scores are zero for non-causal SNPs $j \not\in C$.</p>
 <p><strong>Update: the proper way to model polygenic effect is to use random effect model for SNPs, along the lines of GCTA paper, and summary statistics along the lines of RSS paper</strong>. Let $z_j$ be the true (standardized) effect size of SNP $j$, we have the prior distribution:</p>
-<p>$$z_j \sim (1-\pi) \delta_0 + \pi N(0, \sigma^2)$$</p>
-<p>For a causal SNP, the parameter $\sigma^2$ is related to PVE. Assuming all SNPs contribute equally,</p>
-<p>$$PVE_j = \frac{\sigma^2}{N}$$</p>
-<p>so for our data $\sigma = \sqrt{PVE_j \times N} = 3.27$. In my implementation below, for $j \in C$ instead of setting it to fixed value $\pm 3.27$, I draw it from $N(0, 3.27^2)$.</p>
+$$z_j \sim (1-\pi) \delta_0 + \pi N(0, \sigma^2)$$<p>For a causal SNP, the parameter $\sigma^2$ is related to PVE. Assuming all SNPs contribute equally,</p>
+$$PVE_j = \frac{\sigma^2}{N}$$<p>so for our data $\sigma = \sqrt{PVE_j \times N} = 3.27$. In my implementation below, for $j \in C$ instead of setting it to fixed value $\pm 3.27$, I draw it from $N(0, 3.27^2)$.</p>
 <h3 id="Simulation-of-observed-z-scores">Simulation of observed z-scores<a class="anchor-link" href="#Simulation-of-observed-z-scores">&#182;</a></h3><p>In practice columns of $X$ are correlated due to LD. Observed GWAS z-scores $\hat{z}_j$ vary randomly about expected z-scores $z_j$ (that we derived above) with variance 1 and correlation between $j_1$ and $j_2$ equal to $cor(X_{j_1}, X_{j_2})$ (Methods section of CAVIAR paper has a justification, for example). We simulate multiple observed z-scores from a multivariate normal distrubtion, $$\hat{Z} \sim MVN(RZ, RI)$$ where the $R$ matrix, correlation between SNPs for the simulated genomic region, is the LD matrix. $I$ is identity matrix.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Simulation-of-causal-signals">Simulation of causal signals<a class="anchor-link" href="#Simulation-of-causal-signals">&#182;</a></h3><p>For simplicity we create 2,090 arbitrary chunks of genomic regions (fine-mapping analysis units) each containing 500 SNPs. That is, 2,090 simulations of different underlying LD structure. Each unit should have one or more LD blocks. We assume one causal variant per unit. The exact positions these causal variants occur are associated with genomic annotations.</p>
 <p>Suppose we have $K$ non-overlapping, independent annotation regions. Let $p_k$ and $p_0$ denote causal probability of SNPs inside and outside annotation $k$'s region.</p>
-<p>\begin{align}
+\begin{align}
 \gamma_k &amp; = \frac{p_k/1-p_k}{p_0/1-p_0} \\
 L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
-\end{align}</p>
-<p>where $\gamma_k$ is the odds ratio for annotation $k$ obtained from enrichment analysis, $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overl apping with functional annotations (see choice of $q$ below for two types of annotations).</p>
+\end{align}<p>where $\gamma_k$ is the odds ratio for annotation $k$ obtained from enrichment analysis, $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overl apping with functional annotations (see choice of $q$ below for two types of annotations).</p>
 <h4 id="atac-seq-annotations">atac-seq annotations<a class="anchor-link" href="#atac-seq-annotations">&#182;</a></h4><p>From previous enrichment analysis of 5 atac-seq annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. We can try $\gamma_1 = 3, 5, 7$. The 5 annotations, when combined, physically cover a total of 13.36% of the genome. The average size of the combined peaks is 576; thus iff we assume uniform distribution of peaks over the uniformally distributed 1 million variants we test the consective annotated region should be less than 1. In that case we'll simply assign 13.36% variants in an analysis unit to fall in the annotation, without worrying about their consectiveness.</p>
 <h4 id="Allele-specific-chromatin-accessability-(ASCA)-annotations">Allele-specific chromatin accessability (ASCA) annotations<a class="anchor-link" href="#Allele-specific-chromatin-accessability-(ASCA)-annotations">&#182;</a></h4><p>From previous enrichment analysis of ASCA we have odds ratio of $\gamma_2 = 55$ for ASCA variants with FDR &lt; 0.05. On average 5% variants in each atac-seq peak are ASCA. To add in this annotation, for simplicity we now assume 12.69% variants are atac-seq annotations, 0.66% are ASCA.</p>
 
@@ -364,8 +349,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Fine-mapping-method">Fine-mapping method<a class="anchor-link" href="#Fine-mapping-method">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
 <p>To speed up DAP computations we set its <code>-msize</code> parameter to the oracle number $L$.</p>
@@ -374,8 +358,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="DSC-benchmark">DSC benchmark<a class="anchor-link" href="#DSC-benchmark">&#182;</a></h2><p>Simulate study is implemented in DSC framework. Input data are just matrices of genotypes.</p>
 <p>To run the benchmark, first click inside SoS notebook "restart kernel and run all" botton. Then run the exported scripts with 8 CPU threads:</p>
@@ -386,8 +369,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="zzz.dsc"><code>zzz.dsc</code><a class="anchor-link" href="#zzz.dsc">&#182;</a></h3>
 </div>
@@ -405,7 +387,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 <span class="o">%</span><span class="n">include</span> <span class="n">modules</span><span class="o">/</span><span class="n">evaluate</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -415,7 +397,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -430,8 +412,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="master.dsc"><code>master.dsc</code><a class="anchor-link" href="#master.dsc">&#182;</a></h3>
 </div>
@@ -462,7 +443,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
     <span class="n">output</span><span class="p">:</span> <span class="n">xh_grant</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -472,7 +453,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -487,8 +468,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="simulate_region.dsc"><code>simulate_region.dsc</code><a class="anchor-link" href="#simulate_region.dsc">&#182;</a></h3>
 </div>
@@ -521,7 +501,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="err">$</span><span class="n">annotation</span><span class="p">:</span> <span class="n">prior</span><span class="err">$</span><span class="n">annotation</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -531,7 +511,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -546,8 +526,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="simulate_z.dsc"><code>simulate_z.dsc</code><a class="anchor-link" href="#simulate_z.dsc">&#182;</a></h3>
 </div>
@@ -571,7 +550,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="err">$</span><span class="n">L</span><span class="p">:</span> <span class="n">L</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -581,7 +560,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -596,8 +575,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="fit.dsc"><code>fit.dsc</code><a class="anchor-link" href="#fit.dsc">&#182;</a></h3>
 </div>
@@ -622,7 +600,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="n">prior</span><span class="p">:</span> <span class="err">$</span><span class="n">prior</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -632,7 +610,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -647,8 +625,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="evaluate.dsc"><code>evaluate.dsc</code><a class="anchor-link" href="#evaluate.dsc">&#182;</a></h3>
 </div>
@@ -671,7 +648,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
   <span class="err">$</span><span class="n">purity</span><span class="p">:</span> <span class="n">purity</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -681,7 +658,7 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -696,23 +673,20 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Code-for-Simulation">Code for Simulation<a class="anchor-link" href="#Code-for-Simulation">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="sim_region.R"><code>sim_region.R</code><a class="anchor-link" href="#sim_region.R">&#182;</a></h3><p>To simulate priors for every SNP we need to determine $p_0$ and $p_k$. From equations above, for $L=1$ we derive:</p>
-<p>\begin{align}
+\begin{align}
 p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 [\sum_k q_k \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} + (1-\sum_k q_k)p_0] \times M - 1 = 0
-\end{align}</p>
-<p>We can solve this numerically in R, eg:</p>
+\end{align}<p>We can solve this numerically in R, eg:</p>
 
 </div>
 </div>
@@ -731,7 +705,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 <span class="k">print</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -741,7 +715,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -764,7 +738,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 <span class="k">print</span><span class="p">(</span><span class="n">M</span> <span class="o">*</span> <span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span> <span class="o">*</span> <span class="n">p1</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="nb">sum</span><span class="p">(</span><span class="n">q</span><span class="p">))</span> <span class="o">*</span> <span class="n">p0</span><span class="p">))</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -774,7 +748,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -789,8 +763,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>These probabilities recover the odds ratio, so we should be good. I'll use it in my codes below.</p>
 
@@ -836,7 +809,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 <span class="p">}</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -846,7 +819,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -861,8 +834,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="sim_z.py"><code>sim_z.py</code><a class="anchor-link" href="#sim_z.py">&#182;</a></h3>
 </div>
@@ -901,7 +873,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
     <span class="k">return</span> <span class="n">z</span><span class="p">,</span> <span class="n">z_true</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">z_true</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">!=</span><span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">z_true</span><span class="p">}</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -911,7 +883,7 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -926,24 +898,21 @@ p_k = \frac{\gamma_k p_0}{1 - p_0 + \gamma_k p_0} \\
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Fine-mapping-with-DAP">Fine-mapping with DAP<a class="anchor-link" href="#Fine-mapping-with-DAP">&#182;</a></h2>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="fit_dap.py"><code>fit_dap.py</code><a class="anchor-link" href="#fit_dap.py">&#182;</a></h3>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Below is example output for DAP-G:</p>
 
@@ -1034,7 +1003,7 @@ Independent association signal clusters
     <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">k</span><span class="p">,</span> <span class="n">dap_single_z</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">ld</span><span class="p">,</span> <span class="n">L</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">f</span><span class="s1">&#39;{prefix}_condition_{k}&#39;</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">prior</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Z</span><span class="p">])</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1044,7 +1013,7 @@ Independent association signal clusters
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -1059,8 +1028,7 @@ Independent association signal clusters
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Evaluate-results">Evaluate results<a class="anchor-link" href="#Evaluate-results">&#182;</a></h2><h3 id="evaluate.py"><code>evaluate.py</code><a class="anchor-link" href="#evaluate.py">&#182;</a></h3>
 </div>
@@ -1102,7 +1070,7 @@ Independent association signal clusters
     <span class="n">is_recovered</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_cs_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">is_top_true</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">size</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">purity</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">dap_summary</span><span class="p">(</span><span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;set&#39;</span><span class="p">],</span> <span class="n">posterior</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="s1">&#39;snp&#39;</span><span class="p">],</span> <span class="n">z_true</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -1112,7 +1080,7 @@ Independent association signal clusters
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -1127,7 +1095,7 @@ Independent association signal clusters
 
 </div>
 <hr>
-&copy 2018 Gao Wang at Stephens Lab, University of Chicago
+&copy 2018 Min Qiao and Gao Wang at Stephens Lab, University of Chicago
 <p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b8155df6b12d371d8a5116a5a4c33146d3a44b8d/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 13:10:29 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b8155df6b12d371d8a5116a5a4c33146d3a44b8d">revision 26, b8155df</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>

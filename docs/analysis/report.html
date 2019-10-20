@@ -1,9 +1,8 @@
-
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="ipynb_website:version" content="0.9.5" />
+<meta name="ipynb_website:version" content="0.9.7" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <link rel="stylesheet" type="text/css" href="../css/jt.css">
@@ -226,16 +225,14 @@ body {
   </div><!--/.container -->
 </div><!--/.navbar -->
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Performance-of-annotation-enhanced-fine-mapping">Performance of annotation-enhanced fine-mapping<a class="anchor-link" href="#Performance-of-annotation-enhanced-fine-mapping">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Let's skip the formalities and dive directly into the results: power, false discovery proportion, top hit rate, size and purity.</p>
 
@@ -243,8 +240,7 @@ body {
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Results">Results<a class="anchor-link" href="#Results">&#182;</a></h2>
 </div>
@@ -258,7 +254,7 @@ body {
 <div class=" highlight hl-sos"><pre><span></span><span class="n">readRDS</span><span class="p">(</span><span class="s2">&quot;~/GIT/github/annotation-finemap/analysis/xh_grant/0820.summary.rds&quot;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -268,7 +264,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -294,8 +290,7 @@ body {
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>The error bar should be around $\sigma = 0.01$ in length ($\sqrt{p(1-p)/N}$ where $N$ is 2,090). I plot $2\sigma$.</p>
 
@@ -316,7 +311,7 @@ body {
 <span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -326,7 +321,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 <div class="output_subarea output_stream output_stdout output_text">
@@ -356,7 +351,7 @@ body {
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">get</span> <span class="n">data</span> <span class="o">--</span><span class="kn">from</span> <span class="nn">Python3</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -382,7 +377,7 @@ body {
 <span class="c1"># p + scale_fill_manual(values=wes_palette(n=3, name=&quot;GrandBudapest2&quot;)) + theme_minimal()</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -392,7 +387,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -414,7 +409,7 @@ body {
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">xh_grant_dsc</span><span class="o">.</span><span class="n">png</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -424,7 +419,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -436,7 +431,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -448,7 +443,7 @@ body {
 
 <div class="output_area">
 
-<div class="prompt"></div>
+    <div class="prompt"></div>
 
 
 
@@ -465,8 +460,7 @@ body {
 
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Workflow below was used to obtain this table.</p>
 
@@ -474,8 +468,7 @@ body {
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
+</div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Results-data-processing">Results data processing<a class="anchor-link" href="#Results-data-processing">&#182;</a></h2><p>To get the results,</p>
 
@@ -495,7 +488,7 @@ body {
 <span class="n">dirname</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{cwd:a}/xh_grant/&#39;</span><span class="p">)</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -512,7 +505,7 @@ body {
     <span class="n">saveRDS</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
@@ -606,13 +599,13 @@ body {
     <span class="n">saveRDS</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
 </pre></div>
 
-</div>
+    </div>
 </div>
 </div>
 
 </div>
 <hr>
-&copy 2018 Gao Wang at Stephens Lab, University of Chicago
+&copy 2018 Min Qiao and Gao Wang at Stephens Lab, University of Chicago
 <p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/c1b4d2d33a2167852e9d80dda37e49e2a7269e62/analysis/report.ipynb"><code>analysis/report.ipynb</code></a> committed by Gao Wang on Tue Aug 21 14:34:09 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/c1b4d2d33a2167852e9d80dda37e49e2a7269e62">revision 14, c1b4d2d</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
