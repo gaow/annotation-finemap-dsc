@@ -227,7 +227,15 @@ body {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Annotation-enhanced-genetic-fine-mapping">Annotation enhanced genetic fine-mapping<a class="anchor-link" href="#Annotation-enhanced-genetic-fine-mapping">&#182;</a></h1><h2 id="Aim">Aim<a class="anchor-link" href="#Aim">&#182;</a></h2>
+<h1 id="Annotation-enhanced-genetic-fine-mapping">Annotation enhanced genetic fine-mapping<a class="anchor-link" href="#Annotation-enhanced-genetic-fine-mapping">&#182;</a></h1><p>This notebook investigates the impact of annotation to fine-mapping performance.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Aim">Aim<a class="anchor-link" href="#Aim">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -255,7 +263,16 @@ body {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation-overview">Simulation overview<a class="anchor-link" href="#Simulation-overview">&#182;</a></h2><p>We simulate fine-mapping analysis units of 500 variants, with LD structure estimated from European genotypes of GTEx project (version 8 release).
+<h2 id="Fine-mapping-method-outline">Fine-mapping method outline<a class="anchor-link" href="#Fine-mapping-method-outline">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
+<p>To speed up DAP computations we set its <code>-msize</code> parameter to the oracle number $L$.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Simulation-methods-overview">Simulation methods overview<a class="anchor-link" href="#Simulation-methods-overview">&#182;</a></h2><p>We simulate fine-mapping analysis units of 500 variants, with LD structure estimated from European genotypes of GTEx project (version 8 release).
 Each unit contains &gt;2 LD blocks for this data-set. We generate expected GWAS z-scores under a polygenic model for SCZ, that is, a total of PVE 0.8 contributed by ~6,000 variants.
 We assume effect size of causal variants are identically distributed, but the location of causal variants is associated with genomic annotations: atac-seq annotation and ASCA annotation. 
 From previous results, enrichment estimate (odds ratio) is 3 to 6 for atac-seq peaks of five neuron cell types (what are they??), which in total covers 13.36% of the genome. 
@@ -271,7 +288,7 @@ that ignores annotations. Specifically we look at the "top hit rate", defined as
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Simulation-details">Simulation details<a class="anchor-link" href="#Simulation-details">&#182;</a></h2><p>The general idea is to simulate summary statistics enriched in genomic annotations -- because nowadays most studies work with summary statistics. We need these quantities:</p>
+<h2 id="Simulation-methods-details">Simulation methods details<a class="anchor-link" href="#Simulation-methods-details">&#182;</a></h2><p>The general idea is to simulate summary statistics enriched in genomic annotations -- because nowadays most studies work with summary statistics. We need these quantities:</p>
 <ol>
 <li>GWAS sample size, MAF and LD matrix, which can be estimated from real genotype data<ul>
 <li>We estimate it from GTEx project of ~600 European samples. We use sample size of 80,000 to reflect the scale of available SCZ data.</li>
@@ -344,15 +361,6 @@ L &amp; = [\sum_k q_kp_k + (1-\sum_k q_k)p_0] \times M
 \end{align}<p>where $\gamma_k$ is the odds ratio for annotation $k$ obtained from enrichment analysis, $L$ is the number of causal variants in the region ($L = 1$), $M$ is length of the region ($M=500$), $q$ is proportion of region overl apping with functional annotations (see choice of $q$ below for two types of annotations).</p>
 <h4 id="atac-seq-annotations">atac-seq annotations<a class="anchor-link" href="#atac-seq-annotations">&#182;</a></h4><p>From previous enrichment analysis of 5 atac-seq annotations we estimate enrichment of GWAS signals in these regions with odds ratios ranging from 3.70 to 6.02, with mean 4.74. We can try $\gamma_1 = 3, 5, 7$. The 5 annotations, when combined, physically cover a total of 13.36% of the genome. The average size of the combined peaks is 576; thus iff we assume uniform distribution of peaks over the uniformally distributed 1 million variants we test the consective annotated region should be less than 1. In that case we'll simply assign 13.36% variants in an analysis unit to fall in the annotation, without worrying about their consectiveness.</p>
 <h4 id="Allele-specific-chromatin-accessability-(ASCA)-annotations">Allele-specific chromatin accessability (ASCA) annotations<a class="anchor-link" href="#Allele-specific-chromatin-accessability-(ASCA)-annotations">&#182;</a></h4><p>From previous enrichment analysis of ASCA we have odds ratio of $\gamma_2 = 55$ for ASCA variants with FDR &lt; 0.05. On average 5% variants in each atac-seq peak are ASCA. To add in this annotation, for simplicity we now assume 12.69% variants are atac-seq annotations, 0.66% are ASCA.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Fine-mapping-method">Fine-mapping method<a class="anchor-link" href="#Fine-mapping-method">&#182;</a></h2><p>We use DAP-G to analyze the data. We run and compare two versions of DAP-G: one that uses the "oracle" prior from enrichment based simulation, one uses uniform priors.</p>
-<p>To speed up DAP computations we set its <code>-msize</code> parameter to the oracle number $L$.</p>
 
 </div>
 </div>
@@ -1096,7 +1104,7 @@ Independent association signal clusters
 </div>
 <hr>
 &copy 2018 Min Qiao and Gao Wang at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/b8155df6b12d371d8a5116a5a4c33146d3a44b8d/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Tue Aug 21 13:10:29 2018 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/b8155df6b12d371d8a5116a5a4c33146d3a44b8d">revision 26, b8155df</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/annotation-finemap-dsc/blob/9959df5292194091ee61abfda6180a37e93930aa/analysis/dsc.ipynb"><code>analysis/dsc.ipynb</code></a> committed by Gao Wang on Sun Oct 20 10:11:36 2019 <a href="http://github.com/gaow/annotation-finemap-dsc/commit/9959df5292194091ee61abfda6180a37e93930aa">revision 27, 9959df5</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>
